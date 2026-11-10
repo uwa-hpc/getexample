@@ -2,7 +2,7 @@
 #SBATCH --job-name=GE-gaussian
 #SBATCH --partition=work
 #SBATCH --nodes=1
-#SBATCH --ntasks=2
+#SBATCH --ntasks=16
 # -N is equivalent to --nodes
 # -n is equivalent to --ntasks
 # max ntasks = 1
@@ -14,8 +14,8 @@
 #SBATCH --time=01:00:00   
 #SBATCH --export=NONE
 
-# To compile with the GNU environment, swap from Cray to GNU
-module load pgi/16.10 gaussian/g16
+# To configure the environment 
+module load nvhpc/21.3 gaussian/g16.c02
 
 # leave in, it lists the environment loaded by the modules
 module list
@@ -23,10 +23,15 @@ module list
 #  Note: SLURM_JOBID is a unique number for every job.
 #  These are generic variables
 
-set INPUT = test0194
-set SCRATCH = $MYSCRATCH/run_gaussian/$SLURM_JOBID
-setenv GAUSS_SCRDIR "$SCRATCH"
-set RESULTS = $MYGROUP/gaussian_results
+#INPUT=test0194
+INPUT=my-input
+SCRATCH=$MYSCRATCH/run_gaussian/$SLURM_JOBID
+export GAUSS_SCRDIR="$SCRATCH"
+RESULTS=$MYGROUP/gaussian_results
+
+# set OpenMP parallelism to prevent it from conflicting with 
+# Gaussian's internal parallelism 
+export OMP_NUM_THREADS=1
 
 ###############################################
 # Creates a unique directory in the SCRATCH directory for this job to run in.
@@ -44,21 +49,21 @@ echo the results directory is $RESULTS
 
 ################################################
 # declare the name of the output file or log file
-set OUTPUT = gau_${INPUT}.log
+OUTPUT=gau_${INPUT}.log
 
 #############################################
 #   Copy input files to $SCRATCH
 #   then change directory to $SCRATCH
+cd ${SLURM_SUBMIT_DIR}
+echo "### current directory is "`pwd`
+cp ${INPUT}.com ${SCRATCH}
 
-cp ${INPUT}.com $SCRATCH
-
-cd $SCRATCH
- 
+cd ${SCRATCH}
+pwd
 ls -al
-cd $SLURM_SUBMIT_DIR
 
-g16 < ${INPUT}.com  > ${OUTPUT}
-
+#g16 -p=${SLURM_CPUS_PER_TASK} ${INPUT}.com > ${OUTPUT}
+g16 ${INPUT}.com > ${OUTPUT} 
 #############################################
 #    $OUTPUT file to the unique results dir
 # note this can be a copy or move  
