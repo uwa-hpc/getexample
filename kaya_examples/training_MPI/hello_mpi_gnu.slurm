@@ -52,7 +52,8 @@ cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
 
-srun --mpi=pmix_v3 ./${EXECUTABLE} >> ${OUTPUT}
+#srun --mpi=pmix_v3 ./${EXECUTABLE} >> ${OUTPUT}
+mpirun -np 20 ./${EXECUTABLE} >> ${OUTPUT}
 
 #############################################
 #    $OUTPUT file to the unique results dir
