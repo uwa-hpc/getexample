@@ -1,6 +1,6 @@
 #!/bin/bash -l
 #SBATCH --job-name=GE-fortranMPI_gnu
-#SBATCH --partition=training
+#SBATCH --partition=test
 #SBATCH --nodes=2
 #SBATCH --ntasks=20
 #SBATCH --ntasks-per-node=10
@@ -8,7 +8,7 @@
 #SBATCH --time=00:02:00
 #SBATCH --export=NONE
 
-#SBATCH --account=ea007
+#SBATCH --account=training
 # to not share nodes with other running jobs use #SBATCH -exclusive
 
 
