@@ -2,27 +2,28 @@
 # This is the README file is an executable script.
 # To run type: ./README
 #
-# Example OBJECTIVE: to demonstrate helloworld.c example 
-# in GNU environment on Magnus.
-# helloworld.c is a simple c code that prints "Hello World!" 
+# Example OBJECTIVE: to demonstrate how to run an gaussian
+# example in with nvhpc(PGI) environment on Kaya.
+# 
 # and runs on a single node.
 # cp the input test file
-INPUT=test0194
+INPUT=test0135
 cp $GE_DIR/src/gaussian/${INPUT}.com .
 
 
-# To run this code, we need to specify the number of nodes used.
-# This information is located under helloworld_gnu.slurm
-# You can edit the SLURM as: emacs helloworld_gnu.slurm &
+# To run this code, we need to specify the number of cores used.
+# This information is located in the slurm job script gau.slurm
+# You can edit the SLURM as: nano gau.slurm 
 
 # SLURM directives
 # 
 # Here we specify to SLURM we want 1 node (--nodes=1)
-# To compile the code with the GNU environment, we change
-# the environment from Cray to GNU as shown below:
-module load pgi/16.10 gaussian 
+# 
+# Load the gaussian application into the environment as shown below:
+module load nvhpc/21.3 gaussian/g16.c02
+
 # To run the code, we simply type:
-# aprun -n 1 ./$EXECUTABLE >> ${OUTPUT}
+# g16 ${INPUT}.com > ${OUTPUT}
 
 # To submit the job to Kaya
 jobid=$(sbatch --parsable gau.slurm)
@@ -40,7 +41,7 @@ echo "To check the results change to your jobid directory, type:"
 echo "cd ${MYGROUP}/gaussian_results/${jobid}"
 echo " " 
 echo "To view the results, use the cat command and type:"
-echo "cat test0194.com"
+echo "cat ${INPUT}.com"
 echo " "
 echo " Kaya user shortcuts! " 
 echo  '$MYSCRATCH' "is an environment variable it is set to $MYSCRATCH"

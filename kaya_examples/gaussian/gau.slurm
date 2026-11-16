@@ -23,9 +23,9 @@ module list
 #  Note: SLURM_JOBID is a unique number for every job.
 #  These are generic variables
 
-#INPUT=test0194
-INPUT=my-input
+INPUT=test0135
 SCRATCH=$MYSCRATCH/run_gaussian/$SLURM_JOBID
+# need to define the scratch directory location for Gaussian
 export GAUSS_SCRDIR="$SCRATCH"
 RESULTS=$MYGROUP/gaussian_results
 
@@ -59,13 +59,13 @@ echo "### current directory is "`pwd`
 cp ${INPUT}.com ${SCRATCH}
 
 cd ${SCRATCH}
-pwd
+
 ls -al
 
 #g16 -p=${SLURM_CPUS_PER_TASK} ${INPUT}.com > ${OUTPUT}
-g16 ${INPUT}.com > ${OUTPUT} 
+g16 ${INPUT}.com 
 #############################################
-#    $OUTPUT file to the unique results dir
+# gaussian writes it own OUTPUT file to the unique results dir
 # note this can be a copy or move  
 mv  ${SCRATCH} ${RESULTS}
 
