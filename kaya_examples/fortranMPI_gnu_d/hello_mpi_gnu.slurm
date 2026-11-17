@@ -1,19 +1,19 @@
-#!/bin/bash -l
+#!/bin/bash --login
 #SBATCH --job-name=GE-fortranMPI_gnu
-#SBATCH --partition=test
+#SBATCH --partition=work
 #SBATCH --nodes=2
 #SBATCH --ntasks=20
 #SBATCH --ntasks-per-node=10
 #SBATCH --cpus-per-task=1
-#SBATCH --time=00:01:00
-#SBATCH --export=NONE
-
-#SBATCH --account=ea007
-# to not share nodes with other running jobs use #SBATCH -exclusive
-
+#SBATCH --mem-per-cpu=4GB
+# the default is 1G per cpu(core)
+# HINT!
+# --mem=0 is a special case and grants the job access to all the memory on each node!
+#SBATCH --time=00:05:00
+#SBATCH --export=ALL
 
 # To load the GNU toolchain
-module load gcc openmpi
+module load gcc/14.3.0 openmpi/5.0.5
 
 # leave in, it lists the environment loaded by the modules
 module list
@@ -22,7 +22,7 @@ module list
 #  These are generic variables
 EXECUTABLE=hello_mpi_gnu
 SCRATCH=$MYSCRATCH/run_fortranMPI_gnu/$SLURM_JOBID
-RESULTS=$MYGROUP/mpifortran_gnu_results/$SLURM_JOBID
+RESULTS=$MYGROUP/fortranMPI_gnu_results/$SLURM_JOBID
 #  for openMP codes
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
 ###############################################
@@ -52,12 +52,24 @@ cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
 
-srun --mpi=pmix_v3 ./${EXECUTABLE} >> ${OUTPUT}
+mpirun -np $SLURM_NTASKS ./${EXECUTABLE} >> ${OUTPUT}
+
+if [ $? -ne 0 ]; then
+    cd
+    OUTPUT2=kaya_results.log
+    echo "$EXECUTABLE with jobID $SLURM_JOBID Failed" >> ${OUTPUT2}
+else
+    cd
+    OUTPUT2=kaya_results.log
+    echo "$EXECUTABLE with jobID $SLURM_JOBID Succeeded" >> ${OUTPUT2}
+fi
+
+cd $SCRATCH
 
 #############################################
 #    $OUTPUT file to the unique results dir
 # note this can be a copy or move  
-mv  $OUTPUT ${RESULTS}
+cp  $OUTPUT ${RESULTS}
 
 cd $HOME
 
@@ -67,5 +79,3 @@ cd $HOME
 rm -r $SCRATCH
 
 echo fortranMPI_gnu job finished at  `date`
-
-

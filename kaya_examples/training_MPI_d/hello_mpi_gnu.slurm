@@ -1,25 +1,29 @@
 #!/bin/bash -l
-#SBATCH --job-name=GE-hello_mpi_c_intel
-#SBATCH --partition=short
-#SBATCH --nodes=1
-#SBATCH --ntasks=36
-#SBATCH --ntask-per-node=36
-#SBATCH --mem-per-cpu=2G
-#SBATCH --time=00:05:00
-#SBATCH --export=NONE
+#SBATCH --job-name=GE-fortranMPI_gnu
+#SBATCH --partition=work
+#SBATCH --nodes=2
+#SBATCH --ntasks=20
+#SBATCH --ntasks-per-node=10
+#SBATCH --cpus-per-task=1
+#SBATCH --time=00:02:00
+#SBATCH --export=ALL
 
-# load the intel compiler Intel and MPI libs
-module load intel/2020.4
+# to not share nodes with other running jobs use #SBATCH -exclusive
+
+
+# To load the GNU toolchain
+module load gcc/14.3.0 openmpi/5.0.5
 
 # leave in, it lists the environment loaded by the modules
 module list
 
 #  Note: SLURM_JOBID is a unique number for every job.
 #  These are generic variables
-EXECUTABLE=hello_mpi_intel
-SCRATCH=$MYSCRATCH/run_hello_mpi_c_intel/$SLURM_JOBID
-RESULTS=$MYGROUP/hellompi_c_intel_results/$SLURM_JOBID
-
+EXECUTABLE=hello_mpi_gnu
+SCRATCH=$MYSCRATCH/run_fortranMPI_gnu/$SLURM_JOBID
+RESULTS=$MYGROUP/fortranMPI_gnu_results/$SLURM_JOBID
+#  for openMP codes
+export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
 ###############################################
 # Creates a unique directory in the SCRATCH directory for this job to run in.
 if [ ! -d $SCRATCH ]; then 
@@ -36,17 +40,19 @@ echo the results directory is $RESULTS
 
 ################################################
 # declare the name of the output file or log file
-OUTPUT=hello_mpi_c_intel.log
+OUTPUT=fortranMPI_gnu.log
 
 #############################################
 #   Copy input files to $SCRATCH
 #   then change directory to $SCRATCH
+cd ${SLURM_SUBMIT_DIR}
 
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
 
-srun -n 36 -N 1 ./$EXECUTABLE >> ${OUTPUT}
+#srun --mpi=pmix_v3 ./${EXECUTABLE} >> ${OUTPUT}
+mpirun -np 20 ./${EXECUTABLE} >> ${OUTPUT}
 
 #############################################
 #    $OUTPUT file to the unique results dir
@@ -60,6 +66,6 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo hello_mpi_c_intel job finished at  `date`
+echo fortranMPI_gnu job finished at  `date`
 
 

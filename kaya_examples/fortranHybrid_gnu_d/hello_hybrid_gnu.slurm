@@ -1,21 +1,24 @@
 #!/bin/bash --login
-#SBATCH --job-name=GE-helloC_gnu
-#SBATCH --partition=training
+#SBATCH --job-name=GE-fortranHybrid_gnu
+#SBATCH --partition=work
 #SBATCH --nodes=1
-#SBATCH --time=00:05:00   
-#SBATCH --export=NONE
+#SBATCH --ntasks=6
+#SBATCH --cpus-per-task=2
+#SBATCH --mem-per-cpu=4GB
+#SBATCH --time=00:05:00
+#SBATCH --export=ALL
 
-# To compile with the GNU toolchain
-module load gcc/9.4.0
+# To load the GNU toolchain
+module load gcc/14.3.0 openmpi/5.0.5
 
 # leave in, it lists the environment loaded by the modules
 module list
 
 #  Note: SLURM_JOBID is a unique number for every job.
 #  These are generic variables
-EXECUTABLE=helloworld_gnu
-SCRATCH=$MYSCRATCH/run_helloC_gnu/$SLURM_JOBID
-RESULTS=$MYGROUP/helloC_gnu_results/$SLURM_JOBID
+EXECUTABLE=hello_hybrid_gnu
+SCRATCH=$MYSCRATCH/run_fortranHybrid_gnu/$SLURM_JOBID
+RESULTS=$MYGROUP/fortranHybrid_gnu_results/$SLURM_JOBID
 
 ###############################################
 # Creates a unique directory in the SCRATCH directory for this job to run in.
@@ -33,7 +36,7 @@ echo the results directory is $RESULTS
 
 ################################################
 # declare the name of the output file or log file
-OUTPUT=helloC_gnu.log
+OUTPUT=fortranHybrid_gnu.log
 
 #############################################
 #   Copy input files to $SCRATCH
@@ -42,13 +45,28 @@ OUTPUT=helloC_gnu.log
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
+ls -al
 
-srun -n 1 ./$EXECUTABLE >> ${OUTPUT}
+export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
+echo "Number of threads is $OMP_NUM_THREADS"
+mpirun -np $SLURM_NTASKS --bind-to none -x OMP_NUM_THREADS ./${EXECUTABLE} >> ${OUTPUT}
+
+if [ $? -ne 0 ]; then
+    cd
+    OUTPUT2=kaya_results.log
+    echo "$EXECUTABLE with jobID $SLURM_JOBID Failed" >> ${OUTPUT2}
+else
+    cd
+    OUTPUT2=kaya_results.log
+    echo "$EXECUTABLE with jobID $SLURM_JOBID Succeeded" >> ${OUTPUT2}
+fi
+
+cd $SCRATCH
 
 #############################################
 #    $OUTPUT file to the unique results dir
 # note this can be a copy or move  
-mv  $OUTPUT ${RESULTS}
+cp  $OUTPUT ${RESULTS}
 
 cd $HOME
 
@@ -57,6 +75,4 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo helloC_gnu job finished at  `date`
-
-
+echo fortranHybrid_gnu job finished at  `date`

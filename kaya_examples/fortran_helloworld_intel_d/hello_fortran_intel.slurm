@@ -1,21 +1,26 @@
 #!/bin/bash --login
-#SBATCH --job-name=GE-helloOmp_gnuC
-#SBATCH --partition=POPHEALTH
+#SBATCH --job-name=GE-fortran_helloworld_intel
+#SBATCH --partition=work
 #SBATCH --nodes=1
+# -N is equivalent to --nodes
+# -n is equivalent to --ntasks
+# -c is "number of cores"
+#SBATCH --mem=2G
 #SBATCH --time=00:05:00
 #SBATCH --export=NONE
 
-# to compile with GNU, swap from Cray environment to GNU
-module swap gcc
+# To load the Intel environment
+module use /uwahpc/rocky9/modulefiles/intel/2023.0
+module load compiler
 
 # leave in, it lists the environment loaded by the modules
 module list
 
 #  Note: SLURM_JOBID is a unique number for every job.
 #  These are generic variables
-EXECUTABLE=hello_omp_gnu
-SCRATCH=/home/$USER/run_helloOmp_gnuC/$SLURM_JOBID
-RESULTS=$HOME/helloomp_c_gnu_results/$SLURM_JOBID
+EXECUTABLE=hello_fortran_intel
+SCRATCH=$MYSCRATCH/run_fortran_helloworld_intel/$SLURM_JOBID
+RESULTS=$MYGROUP/hellofortran_intel_results/$SLURM_JOBID
 
 ###############################################
 # Creates a unique directory in the SCRATCH directory for this job to run in.
@@ -33,7 +38,7 @@ echo the results directory is $RESULTS
 
 ################################################
 # declare the name of the output file or log file
-OUTPUT=helloOmp_gnuC.log
+OUTPUT=fortran_helloworld_intel.log
 
 #############################################
 #   Copy input files to $SCRATCH
@@ -43,8 +48,19 @@ cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
 
-export OMP_NUM_THREADS=24
-./$EXECUTABLE >> ${OUTPUT}
+srun --export=ALL -n 1 ./$EXECUTABLE >> ${OUTPUT}
+
+if [ $? -ne 0 ]; then
+    cd
+    OUTPUT2=kaya_results.log
+    echo "$EXECUTABLE with jobID $SLURM_JOBID Failed" >> ${OUTPUT2}
+else
+    cd
+    OUTPUT2=kaya_results.log
+    echo "$EXECUTABLE with jobID $SLURM_JOBID Succeeded" >> ${OUTPUT2}
+fi
+
+cd $SCRATCH
 
 #############################################
 #    $OUTPUT file to the unique results dir
@@ -58,8 +74,5 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo helloOmp_gnuC job finished at  `date`
+echo fortran_helloworld_intel job on kaya finished at  `date`
 
-
-# To swap from GNU environment to the default program environment:
-module swap PrgEnv-gnu PrgEnv-cray
