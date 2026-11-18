@@ -1,34 +1,31 @@
 #!/bin/bash --login
-# This is the README file is an executable script.
+# This README file is an executable script.
 # To run type: ./README
 #
-# Example OBJECTIVE: to demonstrate orca example on Kaya
+# Example OBJECTIVE: to demonstrate ORCA example on Kaya
 # 
-# The input file used is water.inp is taken from
-# https://www.orcasoftware.de/tutorials_orca/first_steps/first_calc.html
-# cp the input file water.inp to users directory.
+# The input file used is water.inp, taken from:
+# https://faccts.de
+# Copy the input file water.inp to user's directory.
 cp $GE_DIR/src/orca/water.inp .
 
-# Orca is an MPI code that can run accross multiple nodes 
-# this is a very simple example and only needs 16 cores (MPI tasks)
+# ORCA is an MPI code that can run across multiple nodes.
+# This is a simple example and needs 16 cores (MPI tasks),
+# matching "%pal nprocs 16 end" inside water.inp.
 
-# To run this code, we need just need to specify the total number of MPI tasks
+# ORCA uses a specific OpenMPI library loaded automatically
+# by the ORCA module once the compiler module is loaded.
 
-# Orca use a specific MPI library that changes with each release.
-# The Orca module loads the correct modules
-
-# This information is can be found in the orca.slurm
-# You can edit the SLURM with nano:  nano orca.slurm 
+# This information can be found in run_orca.slurm
+# You can edit the SLURM script with nano: nano run_orca.slurm
 
 # SLURM directives
-# 
-# Here we specify in the SLURM script that we want 1 nodes (--nodes=1)
-# load the gnu compiler and mpi modules
-module load orca/5.0.2
+# Here we specify in the SLURM script that we want 1 node (--nodes=1)
+# and 16 MPI tasks (--ntasks=16).
+# Load the GNU compiler and ORCA module:
+module load gcc/14.3.0 orca/6.0.0
 
-# To launch a job, we specify 16 MPI tasks (-n 16) in the SLURM script
-
-# To submit the job to kaya
+# To submit the job to Kaya
 jobid=$(sbatch --parsable run_orca.slurm)
 
 echo "The sbatch command returns what the jobid is for this job."
@@ -44,7 +41,7 @@ echo "To check the results change to your jobid directory, type:"
 echo "cd ${MYGROUP}/orca_results/${jobid}"
 echo " " 
 echo "To view the results, use the cat command and type:"
-echo "cat orca_water.log"
+echo "cat orca_water.out"
 echo " "
 echo " Kaya user shortcuts! " 
 echo  '$MYSCRATCH' "is an environment variable it is set to $MYSCRATCH"

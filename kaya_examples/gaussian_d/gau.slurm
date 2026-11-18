@@ -5,8 +5,7 @@
 #SBATCH --ntasks=16
 # -N is equivalent to --nodes
 # -n is equivalent to --ntasks
-# max ntasks = 1
-# note ntasks has to match %proc in your gaussian input file
+# note ntasks has to match %nprocshared in your gaussian input file (or pass -p)
 #SBATCH --mem-per-cpu=4GB
 # the default is 1G per cpu(core)
 # HINT!
@@ -47,10 +46,6 @@ if [ ! -d $RESULTS ]; then
 fi
 echo the results directory is $RESULTS
 
-################################################
-# declare the name of the output file or log file
-OUTPUT=gau_${INPUT}.log
-
 #############################################
 #   Copy input files to $SCRATCH
 #   then change directory to $SCRATCH
@@ -62,20 +57,30 @@ cd ${SCRATCH}
 
 ls -al
 
-#g16 -p=${SLURM_CPUS_PER_TASK} ${INPUT}.com > ${OUTPUT}
-g16 ${INPUT}.com 
+g16 ${INPUT}.com
+
+if [ $? -ne 0 ]; then
+    cd
+    OUTPUT2=kaya_results.log
+    echo "gaussian (${INPUT}) with jobID $SLURM_JOBID Failed" >> ${OUTPUT2}
+else
+    cd
+    OUTPUT2=kaya_results.log
+    echo "gaussian (${INPUT}) with jobID $SLURM_JOBID Succeeded" >> ${OUTPUT2}
+fi
+
+cd ${SCRATCH}
+
 #############################################
-# gaussian writes it own OUTPUT file to the unique results dir
-# note this can be a copy or move  
-mv  ${SCRATCH} ${RESULTS}
+# Gaussian writes ${INPUT}.log directly; move $SCRATCH to $RESULTS/$SLURM_JOBID
+mv ${SCRATCH} ${RESULTS}
 
 cd $HOME
 
 ###########################
-# Clean up $SCRATCH 
-
-rm -r $SCRATCH
+# Clean up $SCRATCH if still present
+if [ -d $SCRATCH ]; then
+    rm -r $SCRATCH
+fi
 
 echo gaussian job finished at  `date`
-
-
