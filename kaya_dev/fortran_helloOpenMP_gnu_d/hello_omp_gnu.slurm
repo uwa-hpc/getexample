@@ -1,21 +1,23 @@
 #!/bin/bash --login
-#SBATCH --job-name=GE-fortran_helloworld_gnu
-#SBATCH --partition=workq
+#SBATCH --job-name=GE-fortran_helloOpenMP_gnu
+#SBATCH --partition=work
 #SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=24
 #SBATCH --time=00:05:00
-#SBATCH --export=NONE
+#SBATCH --export=ALL
 
-# To swap from Cray environment to GNU
-module swap PrgEnv-cray PrgEnv-gnu
+# Load the GNU compiler module
+module load gcc/14.3.0
 
 # leave in, it lists the environment loaded by the modules
 module list
 
 #  Note: SLURM_JOBID is a unique number for every job.
 #  These are generic variables
-EXECUTABLE=hello_fortran_gnu
-SCRATCH=$MYSCRATCH/run_fortran_helloworld_gnu/$SLURM_JOBID
-RESULTS=$MYGROUP/hellofortran_gnu_results/$SLURM_JOBID
+EXECUTABLE=hello_omp_gnu
+SCRATCH=$MYSCRATCH/run_fortran_helloOpenMP_gnu/$SLURM_JOBID
+RESULTS=$MYGROUP/fortran_helloOpenMP_gnu_results/$SLURM_JOBID
 
 ###############################################
 # Creates a unique directory in the SCRATCH directory for this job to run in.
@@ -33,25 +35,26 @@ echo the results directory is $RESULTS
 
 ################################################
 # declare the name of the output file or log file
-OUTPUT=fortran_helloworld_gnu.log
+OUTPUT=fortran_helloOpenMP_gnu.log
 
 #############################################
 #   Copy input files to $SCRATCH
 #   then change directory to $SCRATCH
-
+cd ${SLURM_SUBMIT_DIR}
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
 
-aprun -n 1 ./$EXECUTABLE >> ${OUTPUT}
+export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
+./$EXECUTABLE >> ${OUTPUT}
 
 if [ $? -ne 0 ]; then
     cd
-    OUTPUT2=magnus_results.log
+    OUTPUT2=kaya_results.log
     echo "$EXECUTABLE with jobID $SLURM_JOBID Failed" >> ${OUTPUT2}
 else
     cd
-    OUTPUT2=magnus_results.log
+    OUTPUT2=kaya_results.log
     echo "$EXECUTABLE with jobID $SLURM_JOBID Succeeded" >> ${OUTPUT2}
 fi
 
@@ -60,7 +63,7 @@ cd $SCRATCH
 #############################################
 #    $OUTPUT file to the unique results dir
 # note this can be a copy or move  
-mv  $OUTPUT ${RESULTS}
+mv $OUTPUT ${RESULTS}
 
 cd $HOME
 
@@ -69,8 +72,4 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo fortran_helloworld_gnu job finished at  `date`
-
-# To swap from GNU environment to the default program environment:
-module swap PrgEnv-gnu PrgEnv-cray
-
+echo fortran_helloOpenMP_gnu job finished at `date`

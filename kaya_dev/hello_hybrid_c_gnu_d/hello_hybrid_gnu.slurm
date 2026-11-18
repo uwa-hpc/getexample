@@ -1,21 +1,24 @@
 #!/bin/bash --login
-#SBATCH --job-name=GE-helloOmp_gnuC
-#SBATCH --partition=workq
-#SBATCH --nodes=1
+#SBATCH --job-name=GE-hello_hybrid_c_gnu
+#SBATCH --partition=work
+#SBATCH --nodes=2
+#SBATCH --ntasks=8
+#SBATCH --ntasks-per-node=4
+#SBATCH --cpus-per-task=6
 #SBATCH --time=00:05:00
-#SBATCH --export=NONE
+#SBATCH --export=ALL
 
-# to compile with GNU, swap from Cray environment to GNU
-module swap PrgEnv-cray PrgEnv-gnu
+# Load the GNU and OpenMPI toolchain
+module load gcc/14.3.0 openmpi/5.0.5
 
 # leave in, it lists the environment loaded by the modules
 module list
 
 #  Note: SLURM_JOBID is a unique number for every job.
 #  These are generic variables
-EXECUTABLE=hello_omp_gnu
-SCRATCH=$MYSCRATCH/run_helloOmp_gnuC/$SLURM_JOBID
-RESULTS=$MYGROUP/helloomp_c_gnu_results/$SLURM_JOBID
+EXECUTABLE=hello_hybrid_gnu
+SCRATCH=$MYSCRATCH/run_hello_hybrid_c_gnu/$SLURM_JOBID
+RESULTS=$MYGROUP/hello_hybrid_c_gnu_results/$SLURM_JOBID
 
 ###############################################
 # Creates a unique directory in the SCRATCH directory for this job to run in.
@@ -33,23 +36,36 @@ echo the results directory is $RESULTS
 
 ################################################
 # declare the name of the output file or log file
-OUTPUT=helloOmp_gnuC.log
+OUTPUT=hello_hybrid_c_gnu.log
 
 #############################################
 #   Copy input files to $SCRATCH
 #   then change directory to $SCRATCH
-
+cd ${SLURM_SUBMIT_DIR}
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
 
-export OMP_NUM_THREADS=24
-aprun -n 1 -d 24 ./$EXECUTABLE >> ${OUTPUT}
+export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
+echo "Number of threads is $OMP_NUM_THREADS"
+mpirun -np $SLURM_NTASKS --bind-to none -x OMP_NUM_THREADS ./${EXECUTABLE} >> ${OUTPUT}
+
+if [ $? -ne 0 ]; then
+    cd
+    OUTPUT2=kaya_results.log
+    echo "$EXECUTABLE with jobID $SLURM_JOBID Failed" >> ${OUTPUT2}
+else
+    cd
+    OUTPUT2=kaya_results.log
+    echo "$EXECUTABLE with jobID $SLURM_JOBID Succeeded" >> ${OUTPUT2}
+fi
+
+cd $SCRATCH
 
 #############################################
 #    $OUTPUT file to the unique results dir
 # note this can be a copy or move  
-mv  $OUTPUT ${RESULTS}
+mv $OUTPUT ${RESULTS}
 
 cd $HOME
 
@@ -58,8 +74,4 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo helloOmp_gnuC job finished at  `date`
-
-
-# To swap from GNU environment to the default program environment:
-module swap PrgEnv-gnu PrgEnv-cray
+echo hello_hybrid_c_gnu job finished at `date`

@@ -1,0 +1,63 @@
+#!/bin/bash --login
+# This is the README file is an executable script.
+# To run type: ./README 
+# 
+# Example OBJECTIVE: to demonstrate omp_hello.c example on Kaya
+# with GNU Environment where OpenMP threads are pinned 
+# to a single NUMA region of 12 cores.
+
+# Copy the omp_hello.c source code
+cp $GE_DIR/src/omp_hello.c .
+
+# To run this code, we specify the number of tasks,
+# the number of OpenMP threads, and thread affinity.
+# This information is located under hello_numa_gnu.slurm
+# You can edit the SLURM script as: nano hello_numa_gnu.slurm
+
+# SLURM directives (set in hello_numa_gnu.slurm):
+# Here we specify to SLURM we want 1 node (--nodes=1),
+# 1 task (--ntasks=1), and 12 CPUs per task (--cpus-per-task=12).
+# Load the GNU compiler module:
+module load gcc/14.3.0
+
+# Inside hello_numa_gnu.slurm, we set:
+# export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
+# export OMP_PLACES="{0:12}"
+# export OMP_PROC_BIND=close
+# and launch the executable:
+# ./$EXECUTABLE >> ${OUTPUT}
+
+# To compile the omp_hello.c code in the GNU Environment
+gcc -O2 -fopenmp omp_hello.c -o hello_numa_gnu
+
+# To submit the job to Kaya
+jobid=$(sbatch --parsable hello_numa_gnu.slurm)
+echo ""
+echo "The sbatch command returns what the jobid is for this job."
+echo "To check the status of your job, use the slurm command:"
+echo "squeue -u $USER"
+echo " "
+echo "Your job will be run in $MYSCRATCH/run_hello_NUMA_gnu/${jobid}."
+echo " "
+echo "Your results will be saved in ${MYGROUP}/hello_NUMA_gnu_results/${jobid}"
+echo "and the scratch directory will then be deleted."
+echo " "
+echo "To check the results change to your jobid directory, type:"
+echo "cd ${MYGROUP}/hello_NUMA_gnu_results/${jobid}"
+echo " " 
+echo "To view the results, use the cat command and type:"
+echo "cat hello_NUMA_gnu.log"
+echo " "
+echo " Kaya user shortcuts! " 
+echo  '$MYSCRATCH' "is an environment variable it is set to $MYSCRATCH"
+echo  '$MYGROUP' "is an environment variable it is set to $MYGROUP"
+echo " example:  cd \$MYGROUP "
+
+echo " "  
+echo "more information about Kaya can be found at:"
+echo " https://docs.hpc.uwa.edu.au/docs"
+echo " "
+echo "more information about SLURM and srun can be found at:"
+echo " https://docs.hpc.uwa.edu.au/docs/slurm"
+echo " "
+echo " "
