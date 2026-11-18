@@ -1,21 +1,23 @@
 #!/bin/bash -l
-#SBATCH --job-name=GE-partially_occupied_nodes_intel
-#SBATCH --partition=workq
-#SBATCH --nodes=2
-#SBATCH --time=00:10:00
-#SBATCH --export=NONE
+#SBATCH --job-name=GE-task_placement_gnu
+#SBATCH --partition=work
+#SBATCH --nodes=1
+#SBATCH --ntasks=48
+#SBATCH --ntasks-per-node=48
+#SBATCH --time=00:05:00
+#SBATCH --export=ALL
 
-# to compile with the Intel compiler swap from Cray to Intel
-module swap PrgEnv-cray PrgEnv-intel
+# Load the GNU and OpenMPI toolchain
+module load gcc/14.3.0 openmpi/5.0.5
 
 # leave in, it lists the environment loaded by the modules
 module list
 
 #  Note: SLURM_JOBID is a unique number for every job.
 #  These are generic variables
-EXECUTABLE=hellompi_partial_intel
-SCRATCH=$MYSCRATCH/run_partially_occupied_nodes_intel/$SLURM_JOBID
-RESULTS=$MYGROUP/hellompi_partial_intel_results/$SLURM_JOBID
+EXECUTABLE=task_placement_gnu
+SCRATCH=$MYSCRATCH/run_task_placement_gnu/$SLURM_JOBID
+RESULTS=$MYGROUP/task_placement_gnu_results/$SLURM_JOBID
 
 ###############################################
 # Creates a unique directory in the SCRATCH directory for this job to run in.
@@ -33,22 +35,34 @@ echo the results directory is $RESULTS
 
 ################################################
 # declare the name of the output file or log file
-OUTPUT=partially_occupied_nodes_intel.log
+OUTPUT=task_placement_gnu.log
 
 #############################################
 #   Copy input files to $SCRATCH
 #   then change directory to $SCRATCH
-
+cd ${SLURM_SUBMIT_DIR}
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
 
-aprun -n 24 -N 12 -S 6 ./$EXECUTABLE >> ${OUTPUT}
+mpirun -np $SLURM_NTASKS --map-by core --bind-to core ./$EXECUTABLE >> ${OUTPUT}
+
+if [ $? -ne 0 ]; then
+    cd
+    OUTPUT2=kaya_results.log
+    echo "$EXECUTABLE with jobID $SLURM_JOBID Failed" >> ${OUTPUT2}
+else
+    cd
+    OUTPUT2=kaya_results.log
+    echo "$EXECUTABLE with jobID $SLURM_JOBID Succeeded" >> ${OUTPUT2}
+fi
+
+cd $SCRATCH
 
 #############################################
 #    $OUTPUT file to the unique results dir
 # note this can be a copy or move  
-mv  $OUTPUT ${RESULTS}
+mv $OUTPUT ${RESULTS}
 
 cd $HOME
 
@@ -57,9 +71,4 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo partially_occupied_nodes_intel job finished at  `date`
-
-
-# To swap from Intel environment to the default program environment:
-module swap PrgEnv-intel PrgEnv-cray
-
+echo task_placement_gnu job finished at `date`

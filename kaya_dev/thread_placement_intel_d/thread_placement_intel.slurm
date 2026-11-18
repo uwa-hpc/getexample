@@ -1,21 +1,25 @@
 #!/bin/bash --login
-#SBATCH --job-name=GE-thread_placement_gnu
-#SBATCH --partition=workq
+#SBATCH --job-name=GE-thread_placement_intel
+#SBATCH --partition=work
 #SBATCH --nodes=1
+#SBATCH --ntasks=24
+#SBATCH --ntasks-per-node=24
+#SBATCH --cpus-per-task=2
 #SBATCH --time=00:05:00
-#SBATCH --export=NONE
+#SBATCH --export=ALL
 
-# To compile on the GNU environment, swap from Cray to GNU
-module swap PrgEnv-cray PrgEnv-gnu
+# Load the Intel oneAPI compiler and MPI environment
+module use /uwahpc/rocky9/modulefiles/intel/2023.0
+module load compiler mpi
 
 # leave in, it lists the environment loaded by the modules
 module list
 
 #  Note: SLURM_JOBID is a unique number for every job.
 #  These are generic variables
-EXECUTABLE=thread_placement_gnu
-SCRATCH=$MYSCRATCH/run_thread_placement_gnu/$SLURM_JOBID
-RESULTS=$MYGROUP/thread_placement_gnu_results/$SLURM_JOBID
+EXECUTABLE=thread_placement_intel
+SCRATCH=$MYSCRATCH/run_thread_placement_intel/$SLURM_JOBID
+RESULTS=$MYGROUP/thread_placement_intel_results/$SLURM_JOBID
 
 ###############################################
 # Creates a unique directory in the SCRATCH directory for this job to run in.
@@ -33,23 +37,39 @@ echo the results directory is $RESULTS
 
 ################################################
 # declare the name of the output file or log file
-OUTPUT=thread_placement_gnu.log
+OUTPUT=thread_placement_intel.log
 
 #############################################
 #   Copy input files to $SCRATCH
 #   then change directory to $SCRATCH
-
+cd ${SLURM_SUBMIT_DIR}
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
 
-export OMP_NUM_THREADS=2
-aprun -n 24 -N 24 -d 2 -j 2 ./$EXECUTABLE >> ${OUTPUT}
+export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
+export KMP_AFFINITY="granularity=fine,compact,1,0"
+export I_MPI_PIN=1
+export I_MPI_PIN_DOMAIN=omp
+
+mpirun -np $SLURM_NTASKS ./$EXECUTABLE >> ${OUTPUT}
+
+if [ $? -ne 0 ]; then
+    cd
+    OUTPUT2=kaya_results.log
+    echo "$EXECUTABLE with jobID $SLURM_JOBID Failed" >> ${OUTPUT2}
+else
+    cd
+    OUTPUT2=kaya_results.log
+    echo "$EXECUTABLE with jobID $SLURM_JOBID Succeeded" >> ${OUTPUT2}
+fi
+
+cd $SCRATCH
 
 #############################################
 #    $OUTPUT file to the unique results dir
 # note this can be a copy or move  
-mv  $OUTPUT ${RESULTS}
+mv $OUTPUT ${RESULTS}
 
 cd $HOME
 
@@ -58,9 +78,4 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo thread_placement_gnu job finished at  `date`
-
-# To swap from GNU environment to the default program environment:
-module swap PrgEnv-gnu PrgEnv-cray
-
-
+echo thread_placement_intel job finished at `date`
