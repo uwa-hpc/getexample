@@ -1,12 +1,13 @@
 #!/bin/bash --login
 #SBATCH --job-name=hello_NUMA_gnu
-#SBATCH --partition=workq
+#SBATCH --partition=work
 #SBATCH --nodes=1
+#SBATCH --ntasks=1
 #SBATCH --time=00:05:00
-#SBATCH --export=NONE
+
   
-# to swap from Cray Environment to GNU
-module swap PrgEnv-cray PrgEnv-gnu
+# Load the GNU compilers environment
+module load gcc/14.3.0 openmpi/5.0.5
 
 # leave in, it lists the environment loaded by the modules
 module list
@@ -42,9 +43,10 @@ OUTPUT=hello_NUMA_gnu.log
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
+ls -al
 
 export OMP_NUM_THREADS=12
-aprun -n 1 -d 12 -cc 0-11 ./$EXECUTABLE >> ${OUTPUT}
+srun -n 1 ./$EXECUTABLE >> ${OUTPUT}
 
 #############################################
 #    $OUTPUT file to the unique results dir
@@ -60,6 +62,5 @@ rm -r $SCRATCH
 
 echo hello_NUMA_gnu job finished at  `date`
 
-# To swap from GNU environment to the default program environment:
-module swap PrgEnv-gnu PrgEnv-cray
+
 

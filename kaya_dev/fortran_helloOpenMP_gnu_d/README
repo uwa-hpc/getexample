@@ -2,7 +2,7 @@
 # This is the README file that is an executable script.
 # To run type: ./README
 #
-# Example OBJECTIVE: to demostrate omp_hello.f example on Magnus
+# Example OBJECTIVE: to demostrate omp_hello.f example on Kaya
 # on GNU Environment where omp_hello.f
 # is an OpenMP code and restricted to a single node.
 # cp the omp_hello.f source code
@@ -23,7 +23,7 @@ cp $GE_DIR/src/omp_hello.f .
 # Here we specify to SLURM we want 1 node (--nodes=1)
 # To change the compiler environment from Cray to GNU,
 # we simply add: 
-module swap PrgEnv-cray PrgEnv-gnu
+module load gcc/14.3
 # Then, we set the total number of threads to 24:
 # export OMP_NUM_THREADS=24
 # To launch a job, we specify to aprun 1 OpenMP task (-n 1)
@@ -32,11 +32,12 @@ module swap PrgEnv-cray PrgEnv-gnu
 # aprun -n 1 -d 24 ./$EXECUTABLE >> ${OUTPUT}
 
 # To compile the omp_hello.f code with GNU
-ftn -O2 -fopenmp omp_hello.f -o hello_omp_gnu
+gfortran -O2 -fopenmp omp_hello.f -o hello_omp_gnu
 
-# To submit the job to Magnus
+# To submit the job to Kaya
 sbatch hello_omp_gnu.slurm
-jobid=`squeue -u $USER | grep $USER | awk '{print $1}'`
+jobid=$(sbatch --parsable hello_omp_gnu.slurm)
+
 
 echo "The sbatch command returns what the jobid is for this job."
 echo "To check the status of your job, use the slurm command:"
@@ -53,16 +54,16 @@ echo " "
 echo "To view the results, use the cat command and type:"
 echo "cat fortran_helloOpenMP_gnu.log"
 echo " "
-echo " PAWSEY user shortcuts! " 
+echo " Kaya user shortcuts! " 
 echo  '$MYSCRATCH' "is an environment variable it is set to $MYSCRATCH"
 echo  '$MYGROUP' "is an environment variable it is set to $MYGROUP"
 echo " example:  cd \$MYGROUP "
 
 echo " "  
-echo "more information about Magnus can be found at:"
-echo " https://support.pawsey.org.au/documentation/display/US/Magnus+User+Guide"
+echo "more information about Kaya can be found at:"
+echo " https://docs.hpc.uwa.edu.au/docs"
 echo " "
-echo "more information about SLURM and aprun can be found at:"
-echo " https://support.pawsey.org.au/documentation/display/US/Scheduling+and+Running+Jobs"
+echo "more information about SLURM and srun can be found at:"
+echo " https://docs.hpc.uwa.edu.au/docs/slurm"
 echo " "
 echo " "

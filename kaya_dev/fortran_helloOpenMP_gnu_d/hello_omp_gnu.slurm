@@ -1,21 +1,23 @@
-#!/bin/bash --login
-#SBATCH --job-name=GE-helloC_gnu
-#SBATCH --partition=POPHEALTH
+#!/bin/bash -l
+#SBATCH --job-name=GE-fortran_helloOpenMP_gnu
+#SBATCH --partition=work
 #SBATCH --nodes=1
-#SBATCH --time=00:05:00   
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=24
+#SBATCH --time=00:05:00
 #SBATCH --export=NONE
 
-# To compile with the GNU environment, swap from Cray to GNU
-module load gcc
+# Load the GNU compilers environment
+module load gcc/14.3.0
 
 # leave in, it lists the environment loaded by the modules
 module list
 
 #  Note: SLURM_JOBID is a unique number for every job.
 #  These are generic variables
-EXECUTABLE=helloworld_gnu
-SCRATCH=/scratch/$HOME/run_helloC_gnu/$SLURM_JOBID
-RESULTS=$HOME/helloc_gnu_results/$SLURM_JOBID
+EXECUTABLE=hello_omp_gnu
+SCRATCH=$MYSCRATCH/run_fortran_helloOpenMP_gnu/$SLURM_JOBID
+RESULTS=$MYGROUP/helloomp_f_gnu_results/$SLURM_JOBID
 
 ###############################################
 # Creates a unique directory in the SCRATCH directory for this job to run in.
@@ -33,7 +35,7 @@ echo the results directory is $RESULTS
 
 ################################################
 # declare the name of the output file or log file
-OUTPUT=helloC_gnu.log
+OUTPUT=fortran_helloOpenMP_gnu.log
 
 #############################################
 #   Copy input files to $SCRATCH
@@ -42,7 +44,9 @@ OUTPUT=helloC_gnu.log
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
+ls -al
 
+export OMP_NUM_THREADS=24
 srun -n 1 ./$EXECUTABLE >> ${OUTPUT}
 
 #############################################
@@ -57,6 +61,7 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo helloC_gnu job finished at  `date`
+echo fortran_helloOpenMP_gnu job finished at  `date`
+
 
 

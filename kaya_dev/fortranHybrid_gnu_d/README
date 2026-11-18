@@ -3,7 +3,7 @@
 # To run type: ./README
 #
 # Example OBjECTIVE: to demostrate hybrid_hello.f90 example
-# on Magnus with GNU compiler. This is a mixed-mode job
+# on Kaya with GNU compiler. This is a mixed-mode job
 # cp the hybrid_hello.f90 source code
 cp $GE_DIR/src/hybrid_hello.f90 .
 
@@ -21,7 +21,7 @@ cp $GE_DIR/src/hybrid_hello.f90 .
 # Here we specify to SLURM we want 2 nodes (--nodes=2)
 # To compile the code with GNU Environment,
 # we load the GNU toolchain as shown below:
-module load gcc/8.3.1 openmpi/4.0.0
+module load gcc/14.3 openmpi/5.0.5
 # Then, we set the total number of threads to 6
 # export OMP_NUM_THREADS=6
 # To launch a job, we specify to aprun 8 MPI tasks (-n 8)
@@ -36,7 +36,7 @@ mpif90 -O2 -fopenmp hybrid_hello.f90 -o hello_hybrid_gnu
 
 # To submit the job to Kaya
 sbatch hello_hybrid_gnu.slurm
-jobid=`squeue -u $USER | grep $USER | awk '{print $1}'`
+jobid=$(sbatch --parsable hello_hybrid_gnu.slurm)
 
 echo "The sbatch command returns what the jobid is for this job."
 echo "To check the status of your job, use the slurm command:"
@@ -59,10 +59,10 @@ echo  '$MYGROUP' "is an environment variable it is set to $MYGROUP"
 echo " example:  cd \$MYGROUP "
 
 echo " "  
-echo "more information about Magnus can be found at:"
-echo " https://support.pawsey.org.au/documentation/display/US/Magnus+User+Guide"
+echo "more information about Kaya can be found at:"
+echo " https://docs.hpc.uwa.edu.au/docs"
 echo " "
-echo "more information about SLURM and aprun can be found at:"
-echo " https://support.pawsey.org.au/documentation/display/US/Scheduling+and+Running+Jobs"
+echo "more information about SLURM and srun can be found at:"
+echo " https://docs.hpc.uwa.edu.au/docs/slurm"
 echo " "
 echo " "
