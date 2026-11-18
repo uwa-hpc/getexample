@@ -19,7 +19,7 @@ cp $GE_DIR/src/helloworld.c .
 # Here we specify to SLURM we want 1 node (--nodes=1)
 # To compile the code with the GNU environment, we load 
 # the gcc environment module as shown below:
-module load gcc 
+module load gcc/14.3 
 # To run the code, we simply type:
 # srun -n 1 ./$EXECUTABLE >> ${OUTPUT}
 

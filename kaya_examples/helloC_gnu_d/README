@@ -3,7 +3,7 @@
 # To run type: ./README
 #
 # Example OBJECTIVE: to demonstrate helloworld.c example 
-# in GNU environment on Magnus.
+# in GNU environment on Kaya.
 # helloworld.c is a simple c code that prints "Hello World!" 
 # and runs on a single node.
 # cp the helloworld.c source code
@@ -19,7 +19,7 @@ cp $GE_DIR/src/helloworld.c .
 # Here we specify to SLURM we want 1 node (--nodes=1)
 # To compile the code with the GNU environment, we load 
 # the gcc environment module as shown below:
-module load gcc 
+module load gcc/14.3
 # To run the code, we simply type:
 # srun -n 1 ./$EXECUTABLE >> ${OUTPUT}
 
@@ -44,16 +44,16 @@ echo " "
 echo "To view the results, use the cat command and type:"
 echo "cat helloC_gnu.log"
 echo " "
-echo " PAWSEY user shortcuts! " 
+echo " Kaya user shortcuts! " 
 echo  '$MYSCRATCH' "is an environment variable it is set to $MYSCRATCH"
 echo  '$MYGROUP' "is an environment variable it is set to $MYGROUP"
 echo " example:  cd \$MYGROUP "
 
 echo " "  
-echo "more information about UWA HPC and Kaya can be found at:"
-echo " https://uniwa.sharepoint.com/teams/EXT-UWA-HPC"
+echo "more information about Kaya can be found at:"
+echo " https://docs.hpc.uwa.edu.au/docs"
 echo " "
 echo "more information about SLURM and srun can be found at:"
-echo " https://docs.hpc.uwa.edu.au/docs/"
+echo " https://docs.hpc.uwa.edu.au/docs/slurm"
 echo " "
 echo " "

@@ -1,13 +1,13 @@
 #!/bin/bash -l
 #SBATCH --job-name=GE-grasp
-#SBATCH --partition=test
+#SBATCH --partition=work
 #SBATCH --nodes=1
 #SBATCH --ntasks=34
 #SBATCH --time=02:00:00
 #SBATCH --export=ALL
 
 # To swap from Cray Environment to GNU
-module load gcc/8.3.1 openmpi/4.0.0 lapack/3.9.0
+module load gcc/14.3.0 openmpi/5.0.5 lapack/3.12.1
 
 # leave in, it lists the environment loaded by the modules
 module list
