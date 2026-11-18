@@ -1,21 +1,23 @@
-#!/bin/bash -l
-#SBATCH --job-name=GE-fortran_helloOpenMP_intel
-#SBATCH --partition=workq
+#!/bin/bash --login
+#SBATCH --job-name=GE-helloC_intel
+#SBATCH --partition=work
 #SBATCH --nodes=1
-#SBATCH --time=00:05:00
-#SBATCH --export=NONE
+#SBATCH --ntasks=1
+#SBATCH --time=00:05:00   
+#SBATCH --export=ALL
 
-# to swap from Cray Environment to Intel
-module swap PrgEnv-cray PrgEnv-intel
+# Load the Intel oneAPI compiler environment
+module use /uwahpc/rocky9/modulefiles/intel/2023.0
+module load compiler
 
 # leave in, it lists the environment loaded by the modules
 module list
 
 #  Note: SLURM_JOBID is a unique number for every job.
 #  These are generic variables
-EXECUTABLE=hello_omp_intel
-SCRATCH=$MYSCRATCH/run_fortran_helloOpenMP_intel/$SLURM_JOBID
-RESULTS=$MYGROUP/helloomp_f_intel_results/$SLURM_JOBID
+EXECUTABLE=helloworld_intel
+SCRATCH=$MYSCRATCH/run_helloC_intel/$SLURM_JOBID
+RESULTS=$MYGROUP/helloC_intel_results/$SLURM_JOBID
 
 ###############################################
 # Creates a unique directory in the SCRATCH directory for this job to run in.
@@ -33,25 +35,34 @@ echo the results directory is $RESULTS
 
 ################################################
 # declare the name of the output file or log file
-OUTPUT=fortran_helloOpenMP_intel.log
+OUTPUT=helloC_intel.log
 
 #############################################
 #   Copy input files to $SCRATCH
 #   then change directory to $SCRATCH
-
+cd ${SLURM_SUBMIT_DIR}
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
 
-export OMP_NUM_THREADS=24
-export KMP=AFFINITY=disabled
+srun --export=ALL -n 1 ./$EXECUTABLE >> ${OUTPUT}
 
-aprun -n 1 -d 24 ./$EXECUTABLE >> ${OUTPUT}
+if [ $? -ne 0 ]; then
+    cd
+    OUTPUT2=kaya_results.log
+    echo "$EXECUTABLE with jobID $SLURM_JOBID Failed" >> ${OUTPUT2}
+else
+    cd
+    OUTPUT2=kaya_results.log
+    echo "$EXECUTABLE with jobID $SLURM_JOBID Succeeded" >> ${OUTPUT2}
+fi
+
+cd $SCRATCH
 
 #############################################
 #    $OUTPUT file to the unique results dir
 # note this can be a copy or move  
-mv  $OUTPUT ${RESULTS}
+mv $OUTPUT ${RESULTS}
 
 cd $HOME
 
@@ -60,8 +71,4 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo fortran_helloOpenMP_intel job finished at  `date`
-
-# To swap from Intel environment to the default program environment:
-module swap PrgEnv-intel PrgEnv-cray
-
+echo helloC_intel job finished at `date`

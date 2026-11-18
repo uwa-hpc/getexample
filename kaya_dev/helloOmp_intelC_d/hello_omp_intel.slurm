@@ -1,21 +1,24 @@
-#!/bin/bash -l
-#SBATCH --job-name=GE-hello_mpi_c_intel
-#SBATCH --partition=workq
-#SBATCH --nodes=2
+#!/bin/bash --login
+#SBATCH --job-name=GE-helloOmp_intelC
+#SBATCH --partition=work
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=24
 #SBATCH --time=00:05:00
-#SBATCH --export=NONE
+#SBATCH --export=ALL
 
-# to swap the compiler from Cray to Intel
-module swap PrgEnv-cray PrgEnv-intel
+# Load the Intel oneAPI compiler environment
+module use /uwahpc/rocky9/modulefiles/intel/2023.0
+module load compiler
 
 # leave in, it lists the environment loaded by the modules
 module list
 
 #  Note: SLURM_JOBID is a unique number for every job.
 #  These are generic variables
-EXECUTABLE=hello_mpi_intel
-SCRATCH=$MYSCRATCH/run_hello_mpi_c_intel/$SLURM_JOBID
-RESULTS=$MYGROUP/hellompi_c_intel_results/$SLURM_JOBID
+EXECUTABLE=hello_omp_intel
+SCRATCH=$MYSCRATCH/run_helloOmp_intelC/$SLURM_JOBID
+RESULTS=$MYGROUP/helloOmp_intelC_results/$SLURM_JOBID
 
 ###############################################
 # Creates a unique directory in the SCRATCH directory for this job to run in.
@@ -33,22 +36,37 @@ echo the results directory is $RESULTS
 
 ################################################
 # declare the name of the output file or log file
-OUTPUT=hello_mpi_c_intel.log
+OUTPUT=helloOmp_intelC.log
 
 #############################################
 #   Copy input files to $SCRATCH
 #   then change directory to $SCRATCH
-
+cd ${SLURM_SUBMIT_DIR}
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
 
-aprun -n 48 -N 24 ./$EXECUTABLE >> ${OUTPUT}
+export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
+export KMP_AFFINITY=disabled
+
+./$EXECUTABLE >> ${OUTPUT}
+
+if [ $? -ne 0 ]; then
+    cd
+    OUTPUT2=kaya_results.log
+    echo "$EXECUTABLE with jobID $SLURM_JOBID Failed" >> ${OUTPUT2}
+else
+    cd
+    OUTPUT2=kaya_results.log
+    echo "$EXECUTABLE with jobID $SLURM_JOBID Succeeded" >> ${OUTPUT2}
+fi
+
+cd $SCRATCH
 
 #############################################
 #    $OUTPUT file to the unique results dir
 # note this can be a copy or move  
-mv  $OUTPUT ${RESULTS}
+mv $OUTPUT ${RESULTS}
 
 cd $HOME
 
@@ -57,8 +75,4 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo hello_mpi_c_intel job finished at  `date`
-
-
-# To swap from Intel environment to the default program environment:
-module swap PrgEnv-intel PrgEnv-cray
+echo helloOmp_intelC job finished at `date`

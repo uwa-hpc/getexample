@@ -1,12 +1,16 @@
 #!/bin/bash --login
-#SBATCH --job-name=GE-hello_hybrid_c_intel
-#SBATCH --partition=workq
+#SBATCH --job-name=GE-fortranHybrid_intel
+#SBATCH --partition=work
 #SBATCH --nodes=2
+#SBATCH --ntasks=8
+#SBATCH --ntasks-per-node=4
+#SBATCH --cpus-per-task=6
 #SBATCH --time=00:05:00
-#SBATCH --export=NONE
+#SBATCH --export=ALL
 
-# to change from Cray Environment to Intel Environment
-module swap PrgEnv-cray PrgEnv-intel
+# Load the Intel oneAPI compiler and MPI environment
+module use /uwahpc/rocky9/modulefiles/intel/2023.0
+module load compiler mpi
 
 # leave in, it lists the environment loaded by the modules
 module list
@@ -14,8 +18,8 @@ module list
 #  Note: SLURM_JOBID is a unique number for every job.
 #  These are generic variables
 EXECUTABLE=hello_hybrid_intel
-SCRATCH=$MYSCRATCH/run_hello_hybrid_c_intel/$SLURM_JOBID
-RESULTS=$MYGROUP/hellohybrid_c_intel_results/$SLURM_JOBID
+SCRATCH=$MYSCRATCH/run_fortranHybrid_intel/$SLURM_JOBID
+RESULTS=$MYGROUP/fortranHybrid_intel_results/$SLURM_JOBID
 
 ###############################################
 # Creates a unique directory in the SCRATCH directory for this job to run in.
@@ -33,25 +37,39 @@ echo the results directory is $RESULTS
 
 ################################################
 # declare the name of the output file or log file
-OUTPUT=hello_hybrid_c_intel.log
+OUTPUT=fortranHybrid_intel.log
 
 #############################################
 #   Copy input files to $SCRATCH
 #   then change directory to $SCRATCH
-
+cd ${SLURM_SUBMIT_DIR}
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
 
-export OMP_NUM_THREADS=6
-export KMP=AFFINITY=disabled 
+export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
+export KMP_AFFINITY=disabled
+export I_MPI_PIN_DOMAIN=omp
+
 echo "Number of threads is $OMP_NUM_THREADS"
-aprun -n 8 -N 4 -S 2 -d 6 ./$EXECUTABLE >> ${OUTPUT}
+mpirun -np $SLURM_NTASKS ./$EXECUTABLE >> ${OUTPUT}
+
+if [ $? -ne 0 ]; then
+    cd
+    OUTPUT2=kaya_results.log
+    echo "$EXECUTABLE with jobID $SLURM_JOBID Failed" >> ${OUTPUT2}
+else
+    cd
+    OUTPUT2=kaya_results.log
+    echo "$EXECUTABLE with jobID $SLURM_JOBID Succeeded" >> ${OUTPUT2}
+fi
+
+cd $SCRATCH
 
 #############################################
 #    $OUTPUT file to the unique results dir
 # note this can be a copy or move  
-mv  $OUTPUT ${RESULTS}
+mv $OUTPUT ${RESULTS}
 
 cd $HOME
 
@@ -60,7 +78,4 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo hello_hybrid_c_intel job finished at  `date`
-
-# To swap from Intel environment to the default program environment:
-module swap PrgEnv-intel PrgEnv-cray
+echo fortranHybrid_intel job finished at `date`

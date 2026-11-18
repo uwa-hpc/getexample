@@ -1,21 +1,24 @@
 #!/bin/bash -l
-#SBATCH --job-name=GE-fortranMPI_intel
-#SBATCH --partition=workq
-#SBATCH --nodes=2
+#SBATCH --job-name=GE-fortran_helloOpenMP_intel
+#SBATCH --partition=work
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=24
 #SBATCH --time=00:05:00
-#SBATCH --export=NONE
+#SBATCH --export=ALL
 
-# To swap from Cray Environment to Intel
-module swap PrgEnv-cray PrgEnv-intel
+# Load the Intel oneAPI compiler environment
+module use /uwahpc/rocky9/modulefiles/intel/2023.0
+module load compiler
 
 # leave in, it lists the environment loaded by the modules
 module list
 
 #  Note: SLURM_JOBID is a unique number for every job.
 #  These are generic variables
-EXECUTABLE=hello_mpi_intel
-SCRATCH=$MYSCRATCH/run_fortranMPI_intel/$SLURM_JOBID
-RESULTS=$MYGROUP/mpifortran_intel_results/$SLURM_JOBID
+EXECUTABLE=hello_omp_intel
+SCRATCH=$MYSCRATCH/run_fortran_helloOpenMP_intel/$SLURM_JOBID
+RESULTS=$MYGROUP/fortran_helloOpenMP_intel_results/$SLURM_JOBID
 
 ###############################################
 # Creates a unique directory in the SCRATCH directory for this job to run in.
@@ -33,22 +36,37 @@ echo the results directory is $RESULTS
 
 ################################################
 # declare the name of the output file or log file
-OUTPUT=fortranMPI_intel.log
+OUTPUT=fortran_helloOpenMP_intel.log
 
 #############################################
 #   Copy input files to $SCRATCH
 #   then change directory to $SCRATCH
-
+cd ${SLURM_SUBMIT_DIR}
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
 
-aprun -n 48 -N 24 ./$EXECUTABLE >> ${OUTPUT}
+export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
+export KMP_AFFINITY=disabled
+
+./$EXECUTABLE >> ${OUTPUT}
+
+if [ $? -ne 0 ]; then
+    cd
+    OUTPUT2=kaya_results.log
+    echo "$EXECUTABLE with jobID $SLURM_JOBID Failed" >> ${OUTPUT2}
+else
+    cd
+    OUTPUT2=kaya_results.log
+    echo "$EXECUTABLE with jobID $SLURM_JOBID Succeeded" >> ${OUTPUT2}
+fi
+
+cd $SCRATCH
 
 #############################################
 #    $OUTPUT file to the unique results dir
 # note this can be a copy or move  
-mv  $OUTPUT ${RESULTS}
+mv $OUTPUT ${RESULTS}
 
 cd $HOME
 
@@ -57,8 +75,4 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo fortranMPI_intel job finished at  `date`
-
-
-# To swap from Intel environment to the default program environment:
-module swap PrgEnv-intel PrgEnv-cray
+echo fortran_helloOpenMP_intel job finished at `date`

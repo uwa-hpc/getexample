@@ -1,0 +1,63 @@
+#!/bin/bash --login
+# This is the README file that is an executable script.
+# To run type: ./README
+#
+# Example OBJECTIVE: to demonstrate omp_hello.f example on Kaya
+# in the Intel Environment where omp_hello.f
+# is an OpenMP code and runs on a single node.
+
+# Copy the omp_hello.f source code
+cp $GE_DIR/src/omp_hello.f .
+
+# omp_hello.f is taken from
+# https://llnl.gov
+# To run this code, we specify the number of tasks
+# and the number of OpenMP threads per task.
+# This information is located under hello_omp_intel.slurm
+# You can edit the SLURM script as: nano hello_omp_intel.slurm
+
+# SLURM directives (set in hello_omp_intel.slurm):
+# Here we specify to SLURM we want 1 node (--nodes=1),
+# 1 task (--ntasks=1), and 24 CPUs per task (--cpus-per-task=24).
+# Load the Intel oneAPI compiler environment:
+module use /uwahpc/rocky9/modulefiles/intel/2023.0
+module load compiler
+
+# Inside hello_omp_intel.slurm, we set OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
+# and launch the executable:
+# ./$EXECUTABLE >> ${OUTPUT}
+
+# To compile the omp_hello.f code with Intel
+ifx -O2 -qopenmp omp_hello.f -o hello_omp_intel
+
+# To submit the job to Kaya
+jobid=$(sbatch --parsable hello_omp_intel.slurm)
+echo ""
+echo "The sbatch command returns what the jobid is for this job."
+echo "To check the status of your job, use the slurm command:"
+echo "squeue -u $USER"
+echo " "
+echo "Your job will be run in $MYSCRATCH/run_fortran_helloOpenMP_intel/${jobid}."
+echo " "
+echo "Your results will be saved in ${MYGROUP}/fortran_helloOpenMP_intel_results/${jobid}"
+echo "and the scratch directory will then be deleted."
+echo " "
+echo "To check the results change to your jobid directory, type:"
+echo "cd ${MYGROUP}/fortran_helloOpenMP_intel_results/${jobid}"
+echo " " 
+echo "To view the results, use the cat command and type:"
+echo "cat fortran_helloOpenMP_intel.log"
+echo " "
+echo " Kaya user shortcuts! " 
+echo  '$MYSCRATCH' "is an environment variable it is set to $MYSCRATCH"
+echo  '$MYGROUP' "is an environment variable it is set to $MYGROUP"
+echo " example:  cd \$MYGROUP "
+
+echo " "  
+echo "more information about Kaya can be found at:"
+echo " https://docs.hpc.uwa.edu.au/docs"
+echo " "
+echo "more information about SLURM and srun can be found at:"
+echo " https://docs.hpc.uwa.edu.au/docs/slurm"
+echo " "
+echo " "
