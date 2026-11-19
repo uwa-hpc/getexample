@@ -1,22 +1,21 @@
-#!/bin/bash -l
-#SBATCH --job-name=GE-hello_mpi_c_gnu
+#!/bin/bash --login
+#SBATCH --job-name=GE-helloOmp_gnuC
 #SBATCH --partition=work
-#SBATCH --nodes=2
-#SBATCH --ntasks=48
+#SBATCH --nodes=1
 #SBATCH --time=00:05:00
-#SBATCH --export=NONE
+
 
 # Load the GNU compilers environment
-module load gcc/14.3.0 openmpi/5.0.5
+module load gcc/14.3.0
 
 # leave in, it lists the environment loaded by the modules
 module list
 
 #  Note: SLURM_JOBID is a unique number for every job.
 #  These are generic variables
-EXECUTABLE=hello_mpi_gnu
-SCRATCH=$MYSCRATCH/run_hello_mpi_c_gnu/$SLURM_JOBID
-RESULTS=$MYGROUP/hello_mpi_c_gnu_results/$SLURM_JOBID
+EXECUTABLE=hello_omp_gnu
+SCRATCH=$MYSCRATCH/run_helloOmp_gnuC/$SLURM_JOBID
+RESULTS=$MYGROUP/helloOmp_gnuC_results/$SLURM_JOBID
 
 ###############################################
 # Creates a unique directory in the SCRATCH directory for this job to run in.
@@ -34,7 +33,7 @@ echo the results directory is $RESULTS
 
 ################################################
 # declare the name of the output file or log file
-OUTPUT=hello_mpi_c_gnu.log
+OUTPUT=helloOmp_gnuC.log
 
 #############################################
 #   Copy input files to $SCRATCH
@@ -45,6 +44,7 @@ cp $EXECUTABLE $SCRATCH
 cd $SCRATCH
 ls -al
 
+export OMP_NUM_THREADS=24
 srun -n 1 ./$EXECUTABLE >> ${OUTPUT}
 
 #############################################
@@ -59,7 +59,7 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo hello_mpi_c_gnu job finished at  `date`
+echo helloOmp_gnuC job finished at  `date`
 
 
 

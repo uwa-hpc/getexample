@@ -1,21 +1,24 @@
-#!/bin/bash --login
-#SBATCH --job-name=GE-fortranHybrid_intel
-#SBATCH --partition=workq
+#!/bin/bash -l
+#SBATCH --job-name=GE-partially_occupied_nodes_gnu
+#SBATCH --partition=work
 #SBATCH --nodes=2
-#SBATCH --time=00:05:00
-#SBATCH --export=NONE
+#SBATCH --ntasks=24
+#SBATCH --ntasks-per-node=12
+#SBATCH --ntasks-per-socket=6
+#SBATCH --time=00:10:00
 
-# To swap from Cray environment to Intel:
-module swap PrgEnv-cray PrgEnv-intel
+
+# Load the GNU compilers environment
+module load gcc/14.3.0 openmpi/5.0.5
 
 # leave in, it lists the environment loaded by the modules
 module list
 
 #  Note: SLURM_JOBID is a unique number for every job.
 #  These are generic variables
-EXECUTABLE=hello_hybrid_intel
-SCRATCH=$MYSCRATCH/run_fortranHybrid_intel/$SLURM_JOBID
-RESULTS=$MYGROUP/fortranhybrid_intel_results/$SLURM_JOBID
+EXECUTABLE=hellompi_partial_gnu
+SCRATCH=$MYSCRATCH/run_partially_occupied_nodes_gnu/$SLURM_JOBID
+RESULTS=$MYGROUP/partially_occupied_nodes_gnu_results/$SLURM_JOBID
 
 ###############################################
 # Creates a unique directory in the SCRATCH directory for this job to run in.
@@ -33,7 +36,7 @@ echo the results directory is $RESULTS
 
 ################################################
 # declare the name of the output file or log file
-OUTPUT=fortranHybrid_intel.log
+OUTPUT=partially_occupied_nodes_gnu.log
 
 #############################################
 #   Copy input files to $SCRATCH
@@ -42,12 +45,9 @@ OUTPUT=fortranHybrid_intel.log
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
+ls -al
 
-export OMP_NUM_THREADS=6
-export KMP=AFFINITY=disabled
-
-echo "Number of threads is $OMP_NUM_THREADS"
-aprun -n 8 -N 4 -S 2 -d 6 ./$EXECUTABLE >> ${OUTPUT}
+srun -n 24 --ntasks-per-node=12 --ntasks-per-socket=6 ./$EXECUTABLE >> ${OUTPUT}
 
 #############################################
 #    $OUTPUT file to the unique results dir
@@ -61,10 +61,8 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo fortranHybrid_intel job finished at  `date`
+echo partially_occupied_nodes_gnu job finished at  `date`
 
 
-# To swap from Intel environment to the default program environment:
-module swap PrgEnv-intel PrgEnv-cray
 
 

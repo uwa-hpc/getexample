@@ -3,7 +3,7 @@
 # To run type: ./README
 #
 # Example OBjECTIVE: to demostrate hello_mpi.f90 example on 
-# Magnus on GNU environment with two partially occupied nodes.
+# Kaya on GNU environment with two partially occupied nodes.
 # hello_mpi.f90 is an MPI code which runs on 2 nodes
 # with 12 MPI tasks on each node.
 # hello_mpi.f90 code is taken from
@@ -21,9 +21,9 @@ cp $GE_DIR/src/hello_mpi.f90 .
 # SLURM directives
 # 
 # Here we specify to SLURM we want 2 node (--nodes=2)
-# To compile the code with GNU environment, we swap
-# from Cray environment to GNU as shown below:
-module swap PrgEnv-cray PrgEnv-gnu
+# To compile the code with GNU environment, we load the GNU compiler
+# as shown below:
+module load gcc/14.3.0 openmpi/5.0.5
 # To launch a job, we specify to aprun 24 MPI tasks (-n 24)
 # with 12 MPI tasks per node (-N 12)
 # and 6 MPI tasks per socket (-S 6)
@@ -31,11 +31,10 @@ module swap PrgEnv-cray PrgEnv-gnu
 # aprun -n 24 -N 12 -S 6 ./$EXECUTABLE >> ${OUTPUT}
 
 # To compile the hello_mpi.f90 code on GNU
-ftn -O2 hello_mpi.f90 -o hellompi_partial_gnu
+mpif90 -O2 hello_mpi.f90 -o hellompi_partial_gnu
 
 # To submit the job to Magnus
-sbatch hellompi_partial_gnu.slurm
-jobid=`squeue -u $USER | grep $USER | awk '{print $1}'`
+jobid=$(sbatch --parsable hellompi_partial_gnu.slurm)
 
 echo "The sbatch command returns what the jobid is for this job."
 echo "To check the status of your job, use the slurm command:"
@@ -52,16 +51,16 @@ echo " "
 echo "To view the results, use the cat command and type:"
 echo "cat partially_occupied_nodes_gnu.log"
 echo " "
-echo " PAWSEY user shortcuts! " 
+echo " Kaya user shortcuts! " 
 echo  '$MYSCRATCH' "is an environment variable it is set to $MYSCRATCH"
 echo  '$MYGROUP' "is an environment variable it is set to $MYGROUP"
 echo " example:  cd \$MYGROUP "
 
 echo " "  
-echo "more information about Magnus can be found at:"
-echo " https://support.pawsey.org.au/documentation/display/US/Magnus+User+Guide"
+echo "more information about Kaya can be found at:"
+echo " https://docs.hpc.uwa.edu.au/docs"
 echo " "
-echo "more information about SLURM and aprun can be found at:"
-echo " https://support.pawsey.org.au/documentation/display/US/Scheduling+and+Running+Jobs"
+echo "more information about SLURM and srun can be found at:"
+echo " https://docs.hpc.uwa.edu.au/docs/slurm"
 echo " "
 echo " "

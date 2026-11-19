@@ -1,21 +1,23 @@
 #!/bin/bash -l
-#SBATCH --job-name=GE-partially_occupied_nodes_gnu
-#SBATCH --partition=workq
-#SBATCH --nodes=2
-#SBATCH --time=00:10:00
-#SBATCH --export=NONE
+#SBATCH --job-name=GE-fortran_helloOpenMP_intel
+#SBATCH --partition=work
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=8
+#SBATCH --time=00:05:00
 
-# to compile with the GNU compiler swap from Cray to GNU
-module swap PrgEnv-cray PrgEnv-gnu
+# Load the Intel compilers environment
+module use /uwahpc/rocky9/modulefiles/intel/2023.0
+module load compiler
 
 # leave in, it lists the environment loaded by the modules
 module list
 
 #  Note: SLURM_JOBID is a unique number for every job.
 #  These are generic variables
-EXECUTABLE=hellompi_partial_gnu
-SCRATCH=$MYSCRATCH/run_partially_occupied_nodes_gnu/$SLURM_JOBID
-RESULTS=$MYGROUP/hellompi_partial_gnu_results/$SLURM_JOBID
+EXECUTABLE=hello_omp_intel
+SCRATCH=$MYSCRATCH/run_fortran_helloOpenMP_intel/$SLURM_JOBID
+RESULTS=$MYGROUP/fortran_helloOpenMP_intel_results/$SLURM_JOBID
 
 ###############################################
 # Creates a unique directory in the SCRATCH directory for this job to run in.
@@ -33,7 +35,7 @@ echo the results directory is $RESULTS
 
 ################################################
 # declare the name of the output file or log file
-OUTPUT=partially_occupied_nodes_gnu.log
+OUTPUT=fortran_helloOpenMP_intel.log
 
 #############################################
 #   Copy input files to $SCRATCH
@@ -42,8 +44,11 @@ OUTPUT=partially_occupied_nodes_gnu.log
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
+ls -al
 
-aprun -n 24 -N 12 -S 6 ./$EXECUTABLE >> ${OUTPUT}
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+export KMP_AFFINITY=disabled
+srun ./$EXECUTABLE >> ${OUTPUT}
 
 #############################################
 #    $OUTPUT file to the unique results dir
@@ -57,9 +62,7 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo partially_occupied_nodes_gnu job finished at  `date`
+echo fortran_helloOpenMP_intel job finished at  `date`
 
-# To swap from GNU environment to the default program environment:
-module swap PrgEnv-gnu PrgEnv-cray
 
 

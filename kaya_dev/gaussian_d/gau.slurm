@@ -1,21 +1,25 @@
 #!/bin/bash -l
-#SBATCH --job-name=GE-task_placement_gnu
-#SBATCH --partition=workq
+#SBATCH --job-name=GE-gaussian
+#SBATCH --partition=work
 #SBATCH --nodes=1
-#SBATCH --time=00:05:00
-#SBATCH --export=NONE
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=2
+#SBATCH --mem-per-cpu=4GB
+#SBATCH --time=00:15:00
 
-# to compile on GNU environment, swap from Cray to GNU
-module swap PrgEnv-cray PrgEnv-gnu
+# Load the Gaussian compiler environment
+module load gaussian/g16.c02
 
 # leave in, it lists the environment loaded by the modules
 module list
 
 #  Note: SLURM_JOBID is a unique number for every job.
 #  These are generic variables
-EXECUTABLE=task_placement_gnu
-SCRATCH=$MYSCRATCH/run_task_placement_gnu/$SLURM_JOBID
-RESULTS=$MYGROUP/task_placement_gnu_results/$SLURM_JOBID
+
+INPUT=test0194
+SCRATCH=$MYSCRATCH/run_gaussian/$SLURM_JOBID
+export GAUSS_SCRDIR="$SCRATCH"
+RESULTS=$MYGROUP/gaussian_results/$SLURM_JOBID
 
 ###############################################
 # Creates a unique directory in the SCRATCH directory for this job to run in.
@@ -23,7 +27,7 @@ if [ ! -d $SCRATCH ]; then
     mkdir -p $SCRATCH 
 fi 
 echo SCRATCH is $SCRATCH
-
+echo GAUSS_SCRDIR is "${GAUSS_SCRDIR}"
 ###############################################
 # Creates a unique directory in your GROUP directory for the results of this job
 if [ ! -d $RESULTS ]; then 
@@ -33,22 +37,24 @@ echo the results directory is $RESULTS
 
 ################################################
 # declare the name of the output file or log file
-OUTPUT=task_placement_gnu.log
+OUTPUT=gau_${INPUT}.log
 
 #############################################
 #   Copy input files to $SCRATCH
 #   then change directory to $SCRATCH
 
-cp $EXECUTABLE $SCRATCH
+cp ${INPUT}.com $SCRATCH
 
 cd $SCRATCH
+ 
+ls -al
 
-aprun -n 48 -N 48 -j 2 ./$EXECUTABLE >> ${OUTPUT}
+g16 < ${INPUT}.com  > ${OUTPUT}
 
 #############################################
 #    $OUTPUT file to the unique results dir
 # note this can be a copy or move  
-mv  $OUTPUT ${RESULTS}
+mv  ${OUTPUT} ${RESULTS}
 
 cd $HOME
 
@@ -57,8 +63,4 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo task_placement_gnu job finished at  `date`
-
-# To swap from GNU environment to the default program environment:
-module swap PrgEnv-gnu PrgEnv-cray
-
+echo gaussian job finished at  `date`

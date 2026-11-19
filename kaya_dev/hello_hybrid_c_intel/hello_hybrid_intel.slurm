@@ -1,12 +1,15 @@
 #!/bin/bash --login
 #SBATCH --job-name=GE-hello_hybrid_c_intel
-#SBATCH --partition=workq
+#SBATCH --partition=work
 #SBATCH --nodes=2
+#SBATCH --ntasks=8
+#SBATCH --ntasks-per-node=4
+#SBATCH --cpus-per-task=6
 #SBATCH --time=00:05:00
-#SBATCH --export=NONE
 
-# to change from Cray Environment to Intel Environment
-module swap PrgEnv-cray PrgEnv-intel
+# Load the Intel compilers environment
+module use /uwahpc/rocky9/modulefiles/intel/2023.0
+module load compiler mpi
 
 # leave in, it lists the environment loaded by the modules
 module list
@@ -42,11 +45,13 @@ OUTPUT=hello_hybrid_c_intel.log
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
+ls -al
 
-export OMP_NUM_THREADS=6
-export KMP=AFFINITY=disabled 
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+export KMP_AFFINITY=disabled
+
 echo "Number of threads is $OMP_NUM_THREADS"
-aprun -n 8 -N 4 -S 2 -d 6 ./$EXECUTABLE >> ${OUTPUT}
+srun --cpus-per-task=$SLURM_CPUS_PER_TASK ./$EXECUTABLE >> ${OUTPUT}
 
 #############################################
 #    $OUTPUT file to the unique results dir
@@ -62,5 +67,4 @@ rm -r $SCRATCH
 
 echo hello_hybrid_c_intel job finished at  `date`
 
-# To swap from Intel environment to the default program environment:
-module swap PrgEnv-intel PrgEnv-cray
+

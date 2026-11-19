@@ -1,21 +1,22 @@
 #!/bin/bash -l
-#SBATCH --job-name=GE-fortranMPI_intel
-#SBATCH --partition=workq
+#SBATCH --job-name=GE-hello_mpi_c_gnu
+#SBATCH --partition=work
 #SBATCH --nodes=2
+#SBATCH --ntasks=48
 #SBATCH --time=00:05:00
-#SBATCH --export=NONE
 
-# To swap from Cray Environment to Intel
-module swap PrgEnv-cray PrgEnv-intel
+
+# Load the GNU compilers environment
+module load gcc/14.3.0 openmpi/5.0.5
 
 # leave in, it lists the environment loaded by the modules
 module list
 
 #  Note: SLURM_JOBID is a unique number for every job.
 #  These are generic variables
-EXECUTABLE=hello_mpi_intel
-SCRATCH=$MYSCRATCH/run_fortranMPI_intel/$SLURM_JOBID
-RESULTS=$MYGROUP/mpifortran_intel_results/$SLURM_JOBID
+EXECUTABLE=hello_mpi_gnu
+SCRATCH=$MYSCRATCH/run_hello_mpi_c_gnu/$SLURM_JOBID
+RESULTS=$MYGROUP/hello_mpi_c_gnu_results/$SLURM_JOBID
 
 ###############################################
 # Creates a unique directory in the SCRATCH directory for this job to run in.
@@ -33,7 +34,7 @@ echo the results directory is $RESULTS
 
 ################################################
 # declare the name of the output file or log file
-OUTPUT=fortranMPI_intel.log
+OUTPUT=hello_mpi_c_gnu.log
 
 #############################################
 #   Copy input files to $SCRATCH
@@ -42,8 +43,9 @@ OUTPUT=fortranMPI_intel.log
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
+ls -al
 
-aprun -n 48 -N 24 ./$EXECUTABLE >> ${OUTPUT}
+srun -n 48 ./$EXECUTABLE >> ${OUTPUT}
 
 #############################################
 #    $OUTPUT file to the unique results dir
@@ -57,8 +59,7 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo fortranMPI_intel job finished at  `date`
+echo hello_mpi_c_gnu job finished at  `date`
 
 
-# To swap from Intel environment to the default program environment:
-module swap PrgEnv-intel PrgEnv-cray
+

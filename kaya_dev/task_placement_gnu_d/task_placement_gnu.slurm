@@ -1,21 +1,22 @@
-#!/bin/bash --login
-#SBATCH --job-name=GE-helloC_intel
-#SBATCH --partition=workq
+#!/bin/bash -l
+#SBATCH --job-name=GE-task_placement_gnu
+#SBATCH --partition=work
 #SBATCH --nodes=1
-#SBATCH --time=00:05:00   
-#SBATCH --export=NONE
+#SBATCH --ntasks=8
+#SBATCH --ntasks-per-node=8
+#SBATCH --time=00:05:00
 
-# To compile with the Intel environment, swap from Cray to Intel
-module swap PrgEnv-cray PrgEnv-intel
+# Load the GNU compilers environment
+module load gcc/14.3.0 openmpi/5.0.5
 
 # leave in, it lists the environment loaded by the modules
 module list
 
 #  Note: SLURM_JOBID is a unique number for every job.
 #  These are generic variables
-EXECUTABLE=helloworld_intel
-SCRATCH=$MYSCRATCH/run_helloC_intel/$SLURM_JOBID
-RESULTS=$MYGROUP/helloc_intel_results/$SLURM_JOBID
+EXECUTABLE=task_placement_gnu
+SCRATCH=$MYSCRATCH/run_task_placement_gnu/$SLURM_JOBID
+RESULTS=$MYGROUP/task_placement_gnu_results/$SLURM_JOBID
 
 ###############################################
 # Creates a unique directory in the SCRATCH directory for this job to run in.
@@ -33,7 +34,7 @@ echo the results directory is $RESULTS
 
 ################################################
 # declare the name of the output file or log file
-OUTPUT=helloC_intel.log
+OUTPUT=task_placement_gnu.log
 
 #############################################
 #   Copy input files to $SCRATCH
@@ -42,8 +43,9 @@ OUTPUT=helloC_intel.log
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
+ls -al
 
-aprun -n 1 ./$EXECUTABLE >> ${OUTPUT}
+srun -n 8 ./$EXECUTABLE >> ${OUTPUT}
 
 #############################################
 #    $OUTPUT file to the unique results dir
@@ -57,10 +59,7 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo helloC_intel job finished at  `date`
+echo task_placement_gnu job finished at  `date`
 
-
-# To swap from Intel environment to the default program environment:
-module swap PrgEnv-intel PrgEnv-cray
 
 

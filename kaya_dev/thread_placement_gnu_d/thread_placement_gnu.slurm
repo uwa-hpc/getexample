@@ -1,21 +1,23 @@
-#!/bin/bash -l
-#SBATCH --job-name=GE-fortran_helloOpenMP_intel
-#SBATCH --partition=workq
+#!/bin/bash --login
+#SBATCH --job-name=GE-thread_placement_gnu
+#SBATCH --partition=work
 #SBATCH --nodes=1
+#SBATCH --ntasks=4
+#SBATCH --ntasks-per-node=4
+#SBATCH --cpus-per-task=2
 #SBATCH --time=00:05:00
-#SBATCH --export=NONE
 
-# to swap from Cray Environment to Intel
-module swap PrgEnv-cray PrgEnv-intel
+# Load the GNU compilers environment
+module load gcc/14.3.0 openmpi/5.0.5
 
 # leave in, it lists the environment loaded by the modules
 module list
 
 #  Note: SLURM_JOBID is a unique number for every job.
 #  These are generic variables
-EXECUTABLE=hello_omp_intel
-SCRATCH=$MYSCRATCH/run_fortran_helloOpenMP_intel/$SLURM_JOBID
-RESULTS=$MYGROUP/helloomp_f_intel_results/$SLURM_JOBID
+EXECUTABLE=thread_placement_gnu
+SCRATCH=$MYSCRATCH/run_thread_placement_gnu/$SLURM_JOBID
+RESULTS=$MYGROUP/thread_placement_gnu_results/$SLURM_JOBID
 
 ###############################################
 # Creates a unique directory in the SCRATCH directory for this job to run in.
@@ -33,7 +35,7 @@ echo the results directory is $RESULTS
 
 ################################################
 # declare the name of the output file or log file
-OUTPUT=fortran_helloOpenMP_intel.log
+OUTPUT=thread_placement_gnu.log
 
 #############################################
 #   Copy input files to $SCRATCH
@@ -42,11 +44,10 @@ OUTPUT=fortran_helloOpenMP_intel.log
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
+ls -al
 
-export OMP_NUM_THREADS=24
-export KMP=AFFINITY=disabled
-
-aprun -n 1 -d 24 ./$EXECUTABLE >> ${OUTPUT}
+export OMP_NUM_THREADS=2
+srun -n 4 --cpus-per-task=2 ./$EXECUTABLE >> ${OUTPUT}
 
 #############################################
 #    $OUTPUT file to the unique results dir
@@ -60,8 +61,8 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo fortran_helloOpenMP_intel job finished at  `date`
+echo thread_placement_gnu job finished at  `date`
 
-# To swap from Intel environment to the default program environment:
-module swap PrgEnv-intel PrgEnv-cray
+
+
 
