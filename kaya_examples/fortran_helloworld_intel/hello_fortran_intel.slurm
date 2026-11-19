@@ -11,7 +11,7 @@
 
 # To load the Intel environment
 module use /uwahpc/rocky9/modulefiles/intel/2023.0
-module load compiler
+module load compiler/latest
 
 # leave in, it lists the environment loaded by the modules
 module list
