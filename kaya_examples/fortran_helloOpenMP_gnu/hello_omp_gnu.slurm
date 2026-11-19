@@ -5,7 +5,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
 #SBATCH --time=00:05:00
-#SBATCH --export=NONE
+
 
 # Load the GNU compilers environment
 module load gcc/14.3.0

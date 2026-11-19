@@ -6,7 +6,7 @@
 #SBATCH --ntasks-per-node=10
 #SBATCH --cpus-per-task=1
 #SBATCH --time=00:02:00
-#SBATCH --export=ALL
+
 
 # to not share nodes with other running jobs use #SBATCH -exclusive
 

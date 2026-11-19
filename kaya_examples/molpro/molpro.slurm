@@ -17,7 +17,7 @@
 ## # SLURM_CPUS_PER_TASK is set to the value of -c, but only if -c is explicitly set
 #SBATCH -c 8 
 #SBATCH --time=00:05:00
-#SBATCH --export=NONE
+
 
 # 
 module load molpro/2015.1

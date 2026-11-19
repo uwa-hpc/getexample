@@ -5,7 +5,7 @@
 #SBATCH -c 8
 #
 #SBATCH --time=01:00:00   
-#SBATCH --export=NONE
+
 
 # mrcc is compile with the intel compiler
 module load mrcc/2020-02-22

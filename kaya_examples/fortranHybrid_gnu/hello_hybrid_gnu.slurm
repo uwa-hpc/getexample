@@ -6,7 +6,7 @@
 #SBATCH --cpus-per-task=2
 #SBATCH --mem-per-cpu=4GB
 #SBATCH --time=00:05:00
-#SBATCH --export=ALL
+
 
 # To load the GNU toolchain
 module load gcc/14.3.0 openmpi/5.0.5

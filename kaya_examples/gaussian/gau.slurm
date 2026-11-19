@@ -11,7 +11,7 @@
 # HINT!
 # --mem=0 is a special case and grants the job access to all the memory on each node!
 #SBATCH --time=01:00:00   
-#SBATCH --export=NONE
+
 
 # To configure the environment 
 module load nvhpc/21.3 gaussian/g16.c02

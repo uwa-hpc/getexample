@@ -4,7 +4,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=34
 #SBATCH --time=02:00:00
-#SBATCH --export=ALL
+
 
 # To swap from Cray Environment to GNU
 module load gcc/8.3.1 openmpi/4.0.0 lapack/3.9.0

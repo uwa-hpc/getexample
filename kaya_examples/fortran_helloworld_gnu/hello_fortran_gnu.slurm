@@ -11,7 +11,7 @@
 # HINT!
 # --mem=0 is a special case and grants the job access to all the memory on each node!
 #SBATCH --time=00:05:00
-#SBATCH --export=NONE
+
 
 # Load the GNU compilers environment
 module load gcc/14.3.0

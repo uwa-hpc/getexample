@@ -8,7 +8,7 @@
 #SBATCH --ntasks=12
 #SBATCH --mem-per-cpu=3G
 #SBATCH --time=06:00:00   
-#SBATCH --export=NONE
+
 
 # Load the Ansys / LS-DYNA environment
 module load ansys/v261

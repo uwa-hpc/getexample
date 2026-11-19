@@ -8,7 +8,7 @@
 #SBATCH --ntasks-per-node=16
 #SBATCH --mem-per-cpu=4GB
 #SBATCH --time=00:30:00
-#SBATCH --export=NONE
+
 
 # Load the ABAQUS environment
 module load abaqus/2025

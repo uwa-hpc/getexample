@@ -6,7 +6,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --mem-per-cpu=10G
 #SBATCH --time=00:20:00
-#SBATCH --export=NONE
+
 
 # load the compiler GNU and load lammps
 module load gcc/9.4.0 lammps/29Oct20

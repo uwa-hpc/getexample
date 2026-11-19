@@ -8,7 +8,7 @@
 #
 #SBATCH --time=00:10:00   
 #SBATCH --mem-per-cpu=3G
-#SBATCH --export=NONE
+
 
 # Load the GNU compiler and ORCA 6.0.0 (which also loads openmpi/5.0.5)
 module load gcc/14.3.0 orca/6.0.0

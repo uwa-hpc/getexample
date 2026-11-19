@@ -5,7 +5,7 @@
 #SBATCH --ntasks=36
 #SBATCH --mem-per-cpu=10G
 #SBATCH --time=00:40:00
-#SBATCH --export=NONE
+
 
 # load the gcc compiler and gromacs/2020.4 
 module load gcc/9.4.0

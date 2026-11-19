@@ -10,7 +10,7 @@
 # HINT!
 # --mem=0 is a special case and grants the job access to all the memory on each node!
 #SBATCH --time=00:05:00
-#SBATCH --export=NONE
+
 
 # to load the INTEL OneAPI modules and nwchem
 module use /uwahpc/centos8/modulefiles/oneapi-2023.0

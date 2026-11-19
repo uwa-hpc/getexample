@@ -4,7 +4,7 @@
 #SBATCH --nodes=1
 #SBATCH --time=00:05:00   
 #SBATCH --mem=128G
-#SBATCH --export=NONE
+
 
 # To compile with the GNU environment, swap from Cray to GNU
 module load gcc/9.4.0 kat/2.4.1

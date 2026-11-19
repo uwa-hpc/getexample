@@ -7,7 +7,7 @@
 # -c is "number of cores"
 #SBATCH --mem=2G
 #SBATCH --time=00:05:00
-#SBATCH --export=NONE
+
 
 # To load the Intel environment
 module use /uwahpc/rocky9/modulefiles/intel/2023.0

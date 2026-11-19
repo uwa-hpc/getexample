@@ -3,7 +3,7 @@
 #SBATCH --partition=work
 #SBATCH --nodes=1
 #SBATCH --time=00:05:00   
-#SBATCH --export=NONE
+
 
 # To compile with the GNU toolchain
 module load gcc/14.3.0
