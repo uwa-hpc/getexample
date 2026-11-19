@@ -1,0 +1,65 @@
+#!/bin/bash --login
+# This is the README file is an executable script.
+# To run type: ./README
+#
+# Example OBJECTIVE: to demonstrate hybrid_hello.f90 example
+# with thread placement on Kaya in the Intel environment. 
+# Copy the hybrid_hello.f90 source code
+cp $GE_DIR/src/hybrid_hello.f90 .
+
+# This is a hybrid MPI/OpenMP job where we run 24 MPI tasks
+# with 2 OpenMP threads per MPI task pinned to CPU cores.
+# To run this code, we specify the number of MPI tasks,
+# the number of MPI tasks per node, and the number of CPUs per task.
+# This information is located under thread_placement_intel.slurm
+# You can edit the SLURM script as: nano thread_placement_intel.slurm
+
+# SLURM directives (set in thread_placement_intel.slurm):
+# Here we specify to SLURM we want 1 node (--nodes=1),
+# 24 MPI tasks (--ntasks=24), 24 MPI tasks per node (--ntasks-per-node=24),
+# and 2 CPUs per task (--cpus-per-task=2).
+# Load the Intel oneAPI compiler and MPI environment:
+module use /uwahpc/rocky9/modulefiles/intel/2023.0
+module load compiler mpi
+
+# Inside thread_placement_intel.slurm, thread and domain pinning are set with:
+# export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
+# export KMP_AFFINITY="granularity=fine,compact,1,0"
+# export I_MPI_PIN=1
+# export I_MPI_PIN_DOMAIN=omp
+# mpirun -np $SLURM_NTASKS ./$EXECUTABLE >> ${OUTPUT}
+
+# To compile the hybrid_hello.f90 code with Intel MPI
+mpiifort -O2 -qopenmp hybrid_hello.f90 -o thread_placement_intel
+
+# To submit the job to Kaya
+jobid=$(sbatch --parsable thread_placement_intel.slurm)
+echo ""
+echo "The sbatch command returns what the jobid is for this job."
+echo "To check the status of your job, use the slurm command:"
+echo "squeue -u $USER"
+echo " "
+echo "Your job will be run in $MYSCRATCH/run_thread_placement_intel/${jobid}."
+echo " "
+echo "Your results will be saved in ${MYGROUP}/thread_placement_intel_results/${jobid}"
+echo "and the scratch directory will then be deleted."
+echo " "
+echo "To check the results change to your jobid directory, type:"
+echo "cd ${MYGROUP}/thread_placement_intel_results/${jobid}"
+echo " " 
+echo "To view the results, use the cat command and type:"
+echo "cat thread_placement_intel.log"
+echo " "
+echo " Kaya user shortcuts! " 
+echo  '$MYSCRATCH' "is an environment variable it is set to $MYSCRATCH"
+echo  '$MYGROUP' "is an environment variable it is set to $MYGROUP"
+echo " example:  cd \$MYGROUP "
+
+echo " "  
+echo "more information about Kaya can be found at:"
+echo " https://docs.hpc.uwa.edu.au/docs"
+echo " "
+echo "more information about SLURM and srun can be found at:"
+echo " https://docs.hpc.uwa.edu.au/docs/slurm"
+echo " "
+echo " "
