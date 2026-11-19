@@ -2,7 +2,7 @@
 # This is the README file is an executable script.
 # To run type: ./README
 # 
-# Example OBjECTIVE: to demostrate omp_hello.c example on Magnus
+# Example OBjECTIVE: to demostrate omp_hello.c example on Kaya
 # with GNU Environment where threads are restricted 
 # to a single NUMA region of 12 cores.
 # omp_hello.c is taken from 
@@ -21,9 +21,10 @@ cp $GE_DIR/src/omp_hello.c .
 # SLURM directives
 # 
 # Here we specify to SLURM we want 1 node (--nodes=1)
-# To compile this code with Intel, we need to change
-# the environment from Cray to Intel as shown below:
-module swap PrgEnv-cray PrgEnv-intel
+# To compile this code with Intel, we load the Intel compiler
+# as shown below:
+module use /uwahpc/rocky9/modulefiles/intel/2023.0
+module load compiler
 # Then, we set the total number of threads to 12
 # export OMP_NUM_THREADS=12
 # To run with multiple threads on Cray with the Intel environment, 
@@ -37,11 +38,10 @@ module swap PrgEnv-cray PrgEnv-intel
 # aprun -n 1 -d 12 -cc 0-11 ./$EXECUTABLE >> ${OUTPUT}
 
 # To compile the omp_hello.c code on Intel Environment
-cc -O2 -openmp omp_hello.c -o hello_numa_intel
+icx -O2 -qopenmp omp_hello.c -o hello_numa_intel
 
-# To submit the job to Magnus
-sbatch hello_numa_intel.slurm
-jobid=`squeue -u $USER | grep $USER | awk '{print $1}'`
+# To submit the job to Kaya
+jobid=$(sbatch --parsable hello_numa_intel.slurm)
 
 echo "The sbatch command returns what the jobid is for this job."
 echo "To check the status of your job, use the slurm command:"
@@ -58,16 +58,16 @@ echo " "
 echo "To view the results, use the cat command and type:"
 echo "cat hello_NUMA_intel.log"
 echo " "
-echo " PAWSEY user shortcuts! " 
+echo " Kaya user shortcuts! " 
 echo  '$MYSCRATCH' "is an environment variable it is set to $MYSCRATCH"
 echo  '$MYGROUP' "is an environment variable it is set to $MYGROUP"
 echo " example:  cd \$MYGROUP "
 
 echo " "  
-echo "more information about Magnus can be found at:"
-echo " https://support.pawsey.org.au/documentation/display/US/Magnus+User+Guide"
+echo "more information about Kaya can be found at:"
+echo " https://docs.hpc.uwa.edu.au/docs"
 echo " "
-echo "more information about SLURM and aprun can be found at:"
-echo " https://support.pawsey.org.au/documentation/display/US/Scheduling+and+Running+Jobs"
+echo "more information about SLURM and srun can be found at:"
+echo " https://docs.hpc.uwa.edu.au/docs/slurm"
 echo " "
 echo " "

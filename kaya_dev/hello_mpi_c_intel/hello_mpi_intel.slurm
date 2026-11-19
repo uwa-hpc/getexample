@@ -1,12 +1,14 @@
 #!/bin/bash -l
 #SBATCH --job-name=GE-hello_mpi_c_intel
-#SBATCH --partition=workq
+#SBATCH --partition=work
 #SBATCH --nodes=2
+#SBATCH --ntasks=8
+#SBATCH --ntasks-per-node=4
 #SBATCH --time=00:05:00
-#SBATCH --export=NONE
 
-# to swap the compiler from Cray to Intel
-module swap PrgEnv-cray PrgEnv-intel
+# Load the Intel compilers environment
+module use /uwahpc/rocky9/modulefiles/intel/2023.0
+module load compiler mpi
 
 # leave in, it lists the environment loaded by the modules
 module list
@@ -15,7 +17,7 @@ module list
 #  These are generic variables
 EXECUTABLE=hello_mpi_intel
 SCRATCH=$MYSCRATCH/run_hello_mpi_c_intel/$SLURM_JOBID
-RESULTS=$MYGROUP/hellompi_c_intel_results/$SLURM_JOBID
+RESULTS=$MYGROUP/hello_mpi_c_intel_results/$SLURM_JOBID
 
 ###############################################
 # Creates a unique directory in the SCRATCH directory for this job to run in.
@@ -42,8 +44,9 @@ OUTPUT=hello_mpi_c_intel.log
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
+ls -al
 
-aprun -n 48 -N 24 ./$EXECUTABLE >> ${OUTPUT}
+srun ./$EXECUTABLE >> ${OUTPUT}
 
 #############################################
 #    $OUTPUT file to the unique results dir
@@ -60,5 +63,4 @@ rm -r $SCRATCH
 echo hello_mpi_c_intel job finished at  `date`
 
 
-# To swap from Intel environment to the default program environment:
-module swap PrgEnv-intel PrgEnv-cray
+

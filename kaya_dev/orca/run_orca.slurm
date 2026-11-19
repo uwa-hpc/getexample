@@ -1,17 +1,14 @@
-#!/bin/bash 
+#!/bin/bash -l
 #SBATCH --job-name=GE-orca
 #SBATCH --partition=work
-## note -c to use just cores (no mpi)
 #SBATCH --nodes=1
 #SBATCH --ntasks=16
 #SBATCH --ntasks-per-node=16
-#
 #SBATCH --time=00:10:00   
 #SBATCH --mem-per-cpu=3G
-#SBATCH --export=NONE
 
-# 
-module load orca/5.0.4-dyn
+# Load the GNU compiler and ORCA compiler
+module load gcc/14.3.0 orca/6.0.0
 
 # leave in, it lists the environment loaded by the modules
 module list
@@ -20,14 +17,9 @@ module list
 #  These are generic variables
 
 INPUT=water
-#INPUT=fcfc-118-freq
-#INPUT=BLYP-D3-def2-SVP
-#INPUT=pagt-spe-ccsdt-rif12-qz
-#INPUT=tight
 EXEC=orca
 SCRATCH=$MYSCRATCH/run_orca/$SLURM_JOBID
-
-RESULTS=$MYGROUP/orca_results
+RESULTS=$MYGROUP/orca_results/$SLURM_JOBID
 
 ###############################################
 # Creates a unique directory in the SCRATCH directory for this job to run in.
@@ -56,21 +48,19 @@ cp ${INPUT}.inp $SCRATCH
 cd $SCRATCH
 ls -al 
 echo 'number of cpus or tasks is:'  ${SLURM_NTASKS}
-#mpirun -np 16 ${MAALI_ORCA_HOME}/orca  ${INPUT}.inp > ${OUTPUT}
-${MAALI_ORCA_HOME}/orca  ${INPUT}.inp > ${OUTPUT}
+
+$(which orca) ${INPUT}.inp > ${OUTPUT}
+
 #############################################
 # $OUTPUT file to the unique results dir
-# note this can be a copy or move  
-#mv  ${SCRATCH} ${RESULTS}
+mv ${OUTPUT} ${RESULTS}/
 
 cd $HOME
 
 ###########################
 # Clean up $SCRATCH 
-#if [ -d $SCRATCH ]; then
-#    rm -r $SCRATCH
-#fi 
+if [ -d $SCRATCH ]; then
+    rm -r $SCRATCH
+fi 
 
 echo orca job on kaya finished at  `date`
-
-

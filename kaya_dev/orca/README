@@ -17,19 +17,19 @@ cp $GE_DIR/src/orca/water.inp .
 # Orca use a specific MPI library that changes with each release.
 # The Orca module loads the correct modules
 
-# This information is can be found in the orca.slurm
-# You can edit the SLURM with nano:  nano orca.slurm 
+# This information is can be found in the run_orca.slurm
+# You can edit the SLURM with nano:  nano run_orca.slurm 
 
 # SLURM directives
 # 
 # Here we specify in the SLURM script that we want 1 nodes (--nodes=1)
-# load the gnu compiler and mpi modules
-module load orca/5.0.2
+# Load the GNU compiler and ORCA compiler:
+module load gcc/14.3.0 orca/6.0.0
 
 # To launch a job, we specify 16 MPI tasks (-n 16)
 
-# To submit the job to Magnus
-jobid=$(sbatch --parsible run_nwchem.slurm)
+# To submit the job to Kaya
+jobid=$(sbatch --parsable run_orca.slurm)
 
 echo "The sbatch command returns what the jobid is for this job."
 echo "To check the status of your job, use the slurm command:"

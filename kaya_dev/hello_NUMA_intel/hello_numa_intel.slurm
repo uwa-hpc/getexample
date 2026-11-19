@@ -1,12 +1,14 @@
 #!/bin/bash --login
 #SBATCH --job-name=hello_NUMA_intel
-#SBATCH --partition=workq
+#SBATCH --partition=work
 #SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=12
 #SBATCH --time=00:05:00
-#SBATCH --export=NONE
   
-# to swap from Cray Environment to Intel
-module swap PrgEnv-cray PrgEnv-intel
+# Load the Intel compilers environment 
+module use /uwahpc/rocky9/modulefiles/intel/2023.0
+module load compiler
 
 # leave in, it lists the environment loaded by the modules
 module list
@@ -42,11 +44,12 @@ OUTPUT=hello_NUMA_intel.log
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
+ls -al
 
-export OMP_NUM_THREADS=12
-export KMP=AFFINITY=disabled
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+export KMP_AFFINITY=disabled
 
-aprun -n 1 -d 12 -cc 0-11 ./$EXECUTABLE >> ${OUTPUT}
+srun --cpu-bind=cores ./$EXECUTABLE >> ${OUTPUT}
 
 #############################################
 #    $OUTPUT file to the unique results dir
@@ -63,5 +66,4 @@ rm -r $SCRATCH
 echo hello_NUMA_intel job finished at  `date`
 
 
-# To swap from Intel environment to the default program environment:
-module swap PrgEnv-intel PrgEnv-cray
+

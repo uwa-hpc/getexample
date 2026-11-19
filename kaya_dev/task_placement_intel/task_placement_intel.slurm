@@ -1,12 +1,14 @@
 #!/bin/bash -l
 #SBATCH --job-name=GE-task_placement_intel
-#SBATCH --partition=workq
+#SBATCH --partition=work
 #SBATCH --nodes=1
+#SBATCH --ntasks=8
+#SBATCH --ntasks-per-node=8
 #SBATCH --time=00:05:00
-#SBATCH --export=NONE
 
-# to compile on Intel environment, swap from Cray to Intel
-module swap PrgEnv-cray PrgEnv-intel
+# Load the Intel compilers environment
+module use /uwahpc/rocky9/modulefiles/intel/2023.0
+module load compiler mpi
 
 # leave in, it lists the environment loaded by the modules
 module list
@@ -42,8 +44,9 @@ OUTPUT=task_placement_intel.log
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
+ls -al
 
-aprun -n 48 -N 48 -j 2 ./$EXECUTABLE >> ${OUTPUT}
+srun ./$EXECUTABLE >> ${OUTPUT}
 
 #############################################
 #    $OUTPUT file to the unique results dir
@@ -60,5 +63,4 @@ rm -r $SCRATCH
 echo task_placement_intel job finished at  `date`
 
 
-# To swap from Intel environment to the default program environment:
-module swap PrgEnv-intel PrgEnv-cray
+
