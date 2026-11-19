@@ -6,7 +6,7 @@
 #SBATCH --export=NONE
 
 # To compile with the GNU toolchain
-module load gcc/14.3.0
+module load gcc
 
 # leave in, it lists the environment loaded by the modules
 module list
@@ -42,7 +42,6 @@ OUTPUT=helloC_gnu.log
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
-ls -al
 
 srun -n 1 ./$EXECUTABLE >> ${OUTPUT}
 

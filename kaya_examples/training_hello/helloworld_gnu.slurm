@@ -42,7 +42,6 @@ OUTPUT=helloC_gnu.log
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
-ls -al
 
 srun -n 1 ./$EXECUTABLE >> ${OUTPUT}
 

@@ -48,7 +48,6 @@ cd ${SLURM_SUBMIT_DIR}
 cp $INPUT $SCRATCH
 
 cd $SCRATCH
-ls -al
 
 # run the lsdyna simulation 
 lsdyna i=$INPUT ncpu=${SLURM_NPROCS} > ${OUTPUT}

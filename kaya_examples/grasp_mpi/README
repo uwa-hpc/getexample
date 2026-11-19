@@ -3,7 +3,7 @@
 # To run type: ./README
 #
 # Example OBJECTIVE: to demonstrate grasp case1_mpi example 
-# on Kaya on GNU Environment.
+# on kaya on GNU Environment.
 # cp the grasp testcase directory to user directory
 cp -r $GE_DIR/src/grasp .
 
@@ -23,7 +23,7 @@ cp -r $GE_DIR/src/grasp .
 # Here we specify to SLURM we want 1 node (--nodes=1 or -N 1)
 # grasp is compiled with GNU, we change the compiler
 # from GNU as shown below:
-module load gcc/14.3.0 openmpi/5.0.5 lapack/3.12.1
+module load gcc/8.3.1 openmpi/4.0.0 lapack/3.9.0
 
 # To launch a job, we specify to srun 34 MPI tasks (-n 48)
 
@@ -50,16 +50,8 @@ echo " "
 echo "To view the results, use the cat command and type:"
 echo "cat case1_mpi.log"
 echo " "
-echo " Kaya user shortcuts! " 
+echo " kaya user shortcuts! " 
 echo  '$MYSCRATCH' "is an environment variable it is set to $MYSCRATCH"
 echo  '$MYGROUP' "is an environment variable it is set to $MYGROUP"
 echo " example:  cd \$MYGROUP "
 
-echo " "  
-echo "more information about Kaya can be found at:"
-echo " https://docs.hpc.uwa.edu.au/docs"
-echo " "
-echo "more information about SLURM and srun can be found at:"
-echo " https://docs.hpc.uwa.edu.au/docs/slurm"
-echo " "
-echo " "

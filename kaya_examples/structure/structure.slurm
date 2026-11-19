@@ -1,6 +1,6 @@
 #!/bin/bash --login
 #SBATCH --job-name=GE-structure
-#SBATCH --partition=work
+#SBATCH --partition=test
 #SBATCH --nodes=1
 #SBATCH --task=1
 #SBATCH --mem-per-cpu=10G
@@ -8,7 +8,7 @@
 #SBATCH --export=NONE
 
 # Load the GNU and structure environment modules
-module load gcc/14.3.0 structure/2.3.4
+module load gcc structure
 
 # leave in, it lists the environment loaded by the modules
 module list
@@ -48,7 +48,6 @@ OUTPUT=struct.log
 cp $DATA $SCRATCH
 
 cd $SCRATCH
-ls -al
 
 $EXEC $DATA > ${OUTPUT}
 
