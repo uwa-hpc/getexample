@@ -47,6 +47,7 @@ OUTPUT=fortran_helloworld_intel.log
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
+ls -al
 
 srun --export=ALL -n 1 ./$EXECUTABLE >> ${OUTPUT}
 

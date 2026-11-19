@@ -50,6 +50,7 @@ cd ${SLURM_SUBMIT_DIR}
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
+ls -al
 
 #srun --mpi=pmix_v3 ./${EXECUTABLE} >> ${OUTPUT}
 mpirun -np 20 ./${EXECUTABLE} >> ${OUTPUT}

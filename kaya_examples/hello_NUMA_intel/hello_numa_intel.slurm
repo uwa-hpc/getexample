@@ -1,3 +1,4 @@
+
 #!/bin/bash --login
 #SBATCH --job-name=GE-hello_NUMA_intel
 #SBATCH --partition=work
@@ -11,68 +12,54 @@
 module use /uwahpc/rocky9/modulefiles/intel/2023.0
 module load compiler
 
-# leave in, it lists the environment loaded by the modules
+# Display loaded modules
 module list
 
-#  Note: SLURM_JOBID is a unique number for every job.
-#  These are generic variables
+# Define executable and directories
 EXECUTABLE=hello_numa_intel
 SCRATCH=$MYSCRATCH/run_hello_NUMA_intel/$SLURM_JOBID
 RESULTS=$MYGROUP/hello_NUMA_intel_results/$SLURM_JOBID
 
-###############################################
-# Creates a unique directory in the SCRATCH directory for this job to run in.
-if [ ! -d $SCRATCH ]; then 
-    mkdir -p $SCRATCH 
-fi 
-echo SCRATCH is $SCRATCH
+# Create scratch directory
+mkdir -p "$SCRATCH"
+echo "SCRATCH is $SCRATCH"
 
-###############################################
-# Creates a unique directory in your GROUP directory for the results of this job
-if [ ! -d $RESULTS ]; then 
-    mkdir -p $RESULTS 
-fi
-echo the results directory is $RESULTS
+# Create results directory
+mkdir -p "$RESULTS"
+echo "Results directory is $RESULTS"
 
-################################################
-# declare the name of the output file or log file
+# Output log file
 OUTPUT=hello_NUMA_intel.log
 
-#############################################
-#   Copy input files to $SCRATCH
-#   then change directory to $SCRATCH
-cd ${SLURM_SUBMIT_DIR}
-cp $EXECUTABLE $SCRATCH
+# Copy executable into scratch directory
+cd "$SLURM_SUBMIT_DIR" || exit 1
+cp "$EXECUTABLE" "$SCRATCH" || exit 1
+cd "$SCRATCH" || exit 1
 
-cd $SCRATCH
-
+# Configure OpenMP
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
-export KMP_AFFINITY="granularity=fine,explicit,proclist=[0-11]"
+export KMP_AFFINITY="granularity=fine,compact"
 
-./$EXECUTABLE >> ${OUTPUT}
+echo "Number of threads is $OMP_NUM_THREADS"
+echo "Intel affinity: $KMP_AFFINITY"
 
-if [ $? -ne 0 ]; then
-    cd
-    OUTPUT2=kaya_results.log
-    echo "$EXECUTABLE with jobID $SLURM_JOBID Failed" >> ${OUTPUT2}
+# Run with Slurm-managed CPU binding
+srun --cpu-bind=verbose,cores ./$EXECUTABLE >> "$OUTPUT"
+EXIT_STATUS=$?
+
+# Record job success or failure
+cd "$HOME" || exit 1
+
+if [ "$EXIT_STATUS" -ne 0 ]; then
+    echo "$EXECUTABLE with jobID $SLURM_JOBID Failed" >> kaya_results.log
 else
-    cd
-    OUTPUT2=kaya_results.log
-    echo "$EXECUTABLE with jobID $SLURM_JOBID Succeeded" >> ${OUTPUT2}
+    echo "$EXECUTABLE with jobID $SLURM_JOBID Succeeded" >> kaya_results.log
 fi
 
-cd $SCRATCH
+# Move output to results directory
+mv "$SCRATCH/$OUTPUT" "$RESULTS/"
 
-#############################################
-#    $OUTPUT file to the unique results dir
-# note this can be a copy or move  
-mv $OUTPUT ${RESULTS}
+# Clean up scratch directory
+rm -r "$SCRATCH"
 
-cd $HOME
-
-###########################
-# Clean up $SCRATCH 
-
-rm -r $SCRATCH
-
-echo hello_NUMA_intel job finished at `date`
+echo "hello_NUMA_intel job finished at $(date)"

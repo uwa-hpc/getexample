@@ -1,62 +1,55 @@
 #!/bin/bash --login
 # This is the README file is an executable script.
 # To run type: ./README
-# 
-# Example OBJECTIVE: to demonstrate omp_hello.c example on Kaya
-# with Intel Environment where threads are restricted 
-# to a single NUMA region of 12 cores.
+#
+# Example OBJECTIVE: to demonstrate OpenMP thread placement
+# on Kaya using the Intel compiler and Slurm CPU binding.
+#
 # Copy the omp_hello.c source code
 cp $GE_DIR/src/omp_hello.c .
 
-# To run this code, we specify the number of tasks,
-# the number of OpenMP threads, and CPU affinity.
-# This information is located under hello_numa_intel.slurm
-# You can edit the SLURM script as: nano hello_numa_intel.slurm
+# This example uses 1 node, 1 task and 12 CPUs per task.
+# OpenMP creates 12 threads.
+# Intel OpenMP affinity controls thread placement, while
+# Slurm binds the task to its allocated CPU cores.
+#
+# This information is configured in hello_numa_intel.slurm.
 
-# SLURM directives (set in hello_numa_intel.slurm):
-# Here we specify to SLURM we want 1 node (--nodes=1),
-# 1 task (--ntasks=1), and 12 CPUs per task (--cpus-per-task=12).
-# Load the Intel oneAPI compiler environment:
+# Load the Intel oneAPI compiler environment
 module use /uwahpc/rocky9/modulefiles/intel/2023.0
 module load compiler
 
-# Inside hello_numa_intel.slurm, we set:
-# export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
-# export KMP_AFFINITY="granularity=fine,explicit,proclist=[0-11]"
-# and launch the executable:
-# ./$EXECUTABLE >> ${OUTPUT}
-
-# To compile the omp_hello.c code in the Intel Environment
+# Compile the OpenMP C program
 icx -O2 -qopenmp omp_hello.c -o hello_numa_intel
 
 # To submit the job to Kaya
 jobid=$(sbatch --parsable hello_numa_intel.slurm)
-echo ""
-echo "The sbatch command returns what the jobid is for this job."
-echo "To check the status of your job, use the slurm command:"
-echo "squeue -u $USER"
-echo " "
-echo "Your job will be run in $MYSCRATCH/run_hello_NUMA_intel/${jobid}."
-echo " "
-echo "Your results will be saved in ${MYGROUP}/hello_NUMA_intel_results/${jobid}"
-echo "and the scratch directory will then be deleted."
-echo " "
-echo "To check the results change to your jobid directory, type:"
-echo "cd ${MYGROUP}/hello_NUMA_intel_results/${jobid}"
-echo " " 
-echo "To view the results, use the cat command and type:"
-echo "cat hello_NUMA_intel.log"
-echo " "
-echo " Kaya user shortcuts! " 
-echo  '$MYSCRATCH' "is an environment variable it is set to $MYSCRATCH"
-echo  '$MYGROUP' "is an environment variable it is set to $MYGROUP"
-echo " example:  cd \$MYGROUP "
 
-echo " "  
-echo "more information about Kaya can be found at:"
-echo " https://docs.hpc.uwa.edu.au/docs"
-echo " "
-echo "more information about SLURM and srun can be found at:"
-echo " https://docs.hpc.uwa.edu.au/docs/slurm"
-echo " "
-echo " "
+echo ""
+echo "The sbatch command returns the job ID."
+echo "To check the status of your job, use:"
+echo "squeue -u $USER"
+echo ""
+echo "Your job will run in:"
+echo "$MYSCRATCH/run_hello_NUMA_intel/${jobid}"
+echo ""
+echo "Your results will be saved in:"
+echo "${MYGROUP}/hello_NUMA_intel_results/${jobid}"
+echo "The scratch directory will then be deleted."
+echo ""
+echo "To check the results, change to your job directory:"
+echo "cd ${MYGROUP}/hello_NUMA_intel_results/${jobid}"
+echo ""
+echo "To view the results:"
+echo "cat hello_NUMA_intel.log"
+echo ""
+echo "Kaya user shortcuts:"
+echo '$MYSCRATCH' "is set to $MYSCRATCH"
+echo '$MYGROUP' "is set to $MYGROUP"
+echo ""
+echo "More information about Kaya:"
+echo "https://docs.hpc.uwa.edu.au/docs"
+echo ""
+echo "More information about Slurm:"
+echo "https://docs.hpc.uwa.edu.au/docs/slurm"
+echo ""
