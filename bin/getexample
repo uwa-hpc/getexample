@@ -4,43 +4,55 @@
 # export GE_DIR in module file
 #LABEL Files
 hostid=kaya
-echo ${hostid}
-if [[ "${hostid}" == "kaya" ]]; then 
-    declare -a location=("${GE_DIR}/${hostid}_examples")
-fi
-N_dir=${#location[@]}
 
-#TODO Make a list of users downloading examples?
+declare -a location=("${GE_DIR}/${hostid}_examples")
+
+N_dir=${#location[@]}
 
 #Display help message if no example is given
 if [ "$1" == "" ]; then
-	echo "Download an HPC example:"
-	echo "usage:"
-	echo "   getexample <examplename>"
-	echo ""
-	echo "Where <examplename> is the name of the example you want to "
-	echo "download.  This will create a directory named examplename which"
-	echo "you can cd into and hopefully read the README file "
-	echo " and the *.slurm file."
-	echo ""
-	echo "For Example:"
-	echo "  getexample helloworld"
-	echo ""
-	echo "Possible example names:"
+	printf "\nThe purpose of the this tool is to provide you with a template\n"
+	printf "slurm script for a specific application with a generic model.\n"
+	printf "The README file is executes a set of instructions that will \n"
+	printf "submit the associated slurm script using the sbatch command and \n"
+	printf "has information with more insight to the system arcitecture and \n"
+	printf "links to the UWA HPC documentation! \n\n" 
+
+	printf "usage:\n"
+	printf "\t getexample <example_name> \n\n"
+	
+	printf "Where <example_name> is the name of the example you want to \n"
+	printf "download and test.  This will download into your current \n"
+	printf "the example directory which will have TWO files \n"
+	printf "README file and the *.slurm file.\n\n"
+
+
+	
+	printf "For Example:\n"
+	printf "  getexample helloworld \n\n"
+
+	printf "will download a directory call helloworld into your current directory\n"
+	printf "You then can cd into helloworld where you will find a slurm script and \n"
+	printf "the README file. You simple need to run the README file/command:\n"
+	printf " ./README \n\n"
+
+	printf "Available examples on ${hostid}: \n\n"	
+	
 	for (( i = 1; i<${N_dir}+1;i++ ));
 	do 
-	    ls -d ${location[$i-1]}
 	    ls ${location[$i-1]}
 	    echo " " 
 	done
+	# exit getexample here.
 	exit 0
 else
-temp_project_id=`echo $MYGROUP | cut -d "/" -f 3`
-if [[ ! -f ${HOME}/.gehist ]]; then 
-   touch ${HOME}/.gehist 
-fi
-# date +%d/%m/%y
-echo "${hostid}  $1  $USER  "$temp_project_id"  `date +%F`" >> ${HOME}/.gehist 
+# they have requested an example this will create a log in their home directory.
+	temp_project_id=`echo $MYGROUP | cut -d "/" -f 3`
+	if [[ ! -f ${HOME}/.gehist ]]; then 
+   		touch ${HOME}/.gehist 
+	fi
+
+	echo "${hostid}  $1  $USER  "$temp_project_id"  `date +%F`" >> ${HOME}/.gehist 
 
 fi
 
@@ -49,7 +61,7 @@ for (( i = 1; i<${N_dir}+1;i++ ));
 do 
    if [[ -d ${location[$i-1]}/$1 ]]; then
       echo found directory
-#cp example to users current directory
+# this copies the example to the users current directory
       cp -r -v -u ${location[$i-1]}/$1 .
    fi
 done
