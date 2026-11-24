@@ -1,23 +1,57 @@
-#!/bin/bash
+#!/bin/bash --login 
+#LABEL Files
+hostid=kaya
+#echo ${hostid}
 
-if [ -z "$PT" ]; then
-   echo "The PT and PG environment variables are NOT set"
-   echo "this script will install them in ${HOME}.myenv "
-   echo " "
-   pant=`echo $HOME | sed 's/fairthorpe/panther/g'`
-   para=`echo $HOME | sed 's/fairthorpe/paragon/g'`
-
-    if [[ ! -f ${HOME}/.myenv ]]; then
-	touch ${HOME}/.myenv
-        echo "export PT="$pant"" >> ${HOME}/.myenv
-	echo "export PG="$para"" >> ${HOME}/.myenv
-        echo " " >> ${HOME}/.myenv
-   fi
-   echo " " >> ${HOME}/.profile
-   echo "if [ -f ~/.myenv ]; then " >> ${HOME}/.profile 
-   echo "  . ~/.myenv"  >> ${HOME}/.profile
-   echo "fi"  >> ${HOME}/.profile
-   echo " " >> $HOME/.profile 
-else
-   echo "The PT and PG environment variables are set"
+if [[ "${hostid}" == "kaya" ]]; then 
+    declare -a location=("${1}/${hostid}_examples")
 fi
+
+N_dir=${#location[0]}
+printf " example_dir= ${location[0]} \n"
+printf " GE_DIR = ${1}\n"
+
+#if [[ ! -d $GE_DIR/bin ]]; then
+  printf "make directory ${1}/bin \n"
+  printf "make directory ${1}/src \n"
+  printf "make directory `ls -d ${location[0]}` \n"
+#fi   
+cp -r ../
+
+
+if [ ! -f 1.0.lua ]; then
+  printf "=== make module ===\n"
+
+cat << EOF > 1.0.lua
+--[[
+     getexample modulefile
+     Defines the paths required to use getexample
+]]--
+
+-- local vars: define & assign --
+
+-- template variables --
+local INSTALL_ROOT      = "/uwahpc/rocky9/tools/getexample"
+
+-- standard Lmod functions --
+
+help([[
+==========================================================
+  getexample is a tool to provide users with simple 
+  examples for using SLURM.  
+==========================================================
+]])
+
+whatis("Defines the required paths need to use getexample")
+
+-- local functions --
+
+-- environment modifications --
+
+prepend_path ( "PATH",    INSTALL_ROOT .. "/bin" )
+setenv ( "GE_DIR",        INSTALL_ROOT )
+EOF
+else
+  printf "module files exists\n"
+fi
+
