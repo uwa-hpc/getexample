@@ -1,6 +1,6 @@
 #!/bin/bash -l
 #SBATCH --job-name=gromacs_mpi
-#SBATCH --partition=admin
+#SBATCH --partition=work
 #SBATCH --nodes=1
 #SBATCH --ntasks=36
 #SBATCH --mem-per-cpu=10G
@@ -16,7 +16,7 @@ module load gromacs/2020.4
 # Leave in, it lists the environment loaded by the modules
 module list
 
-echo "Submission directory: $SLURM_SUBMIT_DIR"
+printf "%s\n" "Submission directory: $SLURM_SUBMIT_DIR"
 
 # Note: SLURM_JOBID is a unique number for every job.
 EXECUTABLE=gmx
@@ -34,8 +34,8 @@ OUTPUT=gromacs_mpi.log
 mkdir -p "$SCRATCH"
 mkdir -p "$RESULTS"
 
-echo "SCRATCH is $SCRATCH"
-echo "Results directory is $RESULTS"
+printf "%s\n" "SCRATCH is $SCRATCH"
+printf "%s\n" "Results directory is $RESULTS"
 
 ###############################################
 # Copy input files to scratch
@@ -44,7 +44,7 @@ cp "$SOURCE/$PDB_FILE" "$SCRATCH/"
 
 cd "$SCRATCH"
 
-echo "GROMACS input files copied successfully."
+printf "%s\n" "GROMACS input files copied successfully."
 
 ###############################################
 # Download required GROMACS parameter files
@@ -173,7 +173,7 @@ EOF
 
 cp "$OUTPUT" "$RESULTS/"
 
-echo "GROMACS job finished at $(date)"
+printf "%s\n" "GROMACS job finished at $(date)"
 
 ###############################################
 # Clean up scratch
