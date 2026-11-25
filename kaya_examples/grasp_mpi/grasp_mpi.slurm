@@ -26,13 +26,13 @@ RESULTS="$MYGROUP/grasp_results/$SLURM_JOBID"
 mkdir -p "$SCRATCH" || exit 1
 mkdir -p "$RESULTS" || exit 1
 
-echo "Scratch directory: $SCRATCH"
-echo "Results directory: $RESULTS"
-echo "GRASP installation: $GRASP"
+printf "Scratch directory: %s\n" "$SCRATCH"
+printf "Results directory: %s\n" "$RESULTS"
+printf "GRASP installation: %s\n" "$GRASP"
 
 # Check that the required GRASP executable exists
 if [ ! -x "$GRASP/bin/rangular_mpi" ]; then
-    echo "ERROR: GRASP MPI executables not found in $GRASP/bin"
+    printf "ERROR: GRASP MPI executables not found in %s\n" "$GRASP/bin"
     exit 1
 fi
 
@@ -50,9 +50,9 @@ EXIT_STATUS=$?
 
 # Record job outcome
 if [ "$EXIT_STATUS" -ne 0 ]; then
-    echo "GRASP job $SLURM_JOBID failed" >> "$HOME/kaya_results.log"
+    printf "GRASP job %s failed\n" "$SLURM_JOBID" >> "$HOME/kaya_results.log"
 else
-    echo "GRASP job $SLURM_JOBID succeeded" >> "$HOME/kaya_results.log"
+    printf "GRASP job %s succeeded\n" "$SLURM_JOBID" >> "$HOME/kaya_results.log"
 fi
 
 # Save output
@@ -62,5 +62,5 @@ mv "$OUTPUT" "$RESULTS/"
 cd "$HOME" || exit 1
 rm -rf "$SCRATCH"
 
-echo "GRASP MPI job finished at $(date)"
+printf "GRASP MPI job finished at %s\n" "$(date)"
 exit "$EXIT_STATUS"
