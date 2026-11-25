@@ -67,6 +67,6 @@ cd $HOME
 
 rm -r $SCRATCH
 
-printf 'fortranMPI_gnu job finished at  %s\n' "$(date)"
+printf 'fortranMPI_gnu job finished at %s\n' "$(date)"
 
 

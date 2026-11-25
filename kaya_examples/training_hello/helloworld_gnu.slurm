@@ -58,6 +58,6 @@ cd $HOME
 
 rm -r $SCRATCH
 
-printf 'helloC_gnu job finished at  %s\n' "$(date)"
+printf 'helloC_gnu job finished at %s\n' "$(date)"
 
 
