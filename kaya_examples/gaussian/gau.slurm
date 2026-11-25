@@ -37,20 +37,20 @@ export OMP_NUM_THREADS=1
 if [ ! -d $SCRATCH ]; then 
     mkdir -p $SCRATCH 
 fi 
-echo SCRATCH is $SCRATCH
-echo GAUSS_SCRDIR is "${SCRATCH}"
+printf "SCRATCH is %s\n" "$SCRATCH"
+printf "GAUSS_SCRDIR is %s\n" "$SCRATCH"
 ###############################################
 # Creates a unique directory in your GROUP directory for the results of this job
 if [ ! -d $RESULTS ]; then 
     mkdir -p $RESULTS 
 fi
-echo the results directory is $RESULTS
+printf "the results directory is %s\n" "$RESULTS"
 
 #############################################
 #   Copy input files to $SCRATCH
 #   then change directory to $SCRATCH
 cd ${SLURM_SUBMIT_DIR}
-echo "### current directory is "`pwd`
+printf "### current directory is %s\n" "$(pwd)"
 cp ${INPUT}.com ${SCRATCH}
 
 cd ${SCRATCH}
@@ -62,11 +62,11 @@ g16 ${INPUT}.com
 if [ $? -ne 0 ]; then
     cd
     OUTPUT2=kaya_results.log
-    echo "gaussian (${INPUT}) with jobID $SLURM_JOBID Failed" >> ${OUTPUT2}
+    printf "gaussian (%s) with jobID %s Failed\n" "$INPUT" "$SLURM_JOBID" >> ${OUTPUT2}
 else
     cd
     OUTPUT2=kaya_results.log
-    echo "gaussian (${INPUT}) with jobID $SLURM_JOBID Succeeded" >> ${OUTPUT2}
+    printf "gaussian (%s) with jobID %s Succeeded\n" "$INPUT" "$SLURM_JOBID" >> ${OUTPUT2}
 fi
 
 cd ${SCRATCH}
@@ -83,4 +83,4 @@ if [ -d $SCRATCH ]; then
     rm -r $SCRATCH
 fi
 
-echo gaussian job finished at  `date`
+printf "gaussian job finished at %s\n" "$(date)"
