@@ -43,7 +43,7 @@ OUTPUT=lammps.log
 #   then change directory to $SCRATCH
 
 
-cp *.lmp $SCRATCH
+cp "$GE_DIR/src/lammps/"*.lmp "$SCRATCH/"
 
 cd $SCRATCH
 

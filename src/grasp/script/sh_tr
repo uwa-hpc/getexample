@@ -1,13 +1,17 @@
 #!/bin/sh
 set -x
 
+# Use the MPI task allocation provided by SLURM.
+: "${SLURM_NTASKS:?This script must run inside a SLURM job}"
+MPI_TASKS=$SLURM_NTASKS
+
 #  6. Perform transition calculation for the n=6 CI results
 
 n=6
 
 #  First the biorthogonal transformations
 
-mpirun -np 34 rbiotransform_mpi > out_rbiotransform <<EOF
+mpirun -np "$MPI_TASKS" rbiotransform_mpi > out_rbiotransform <<EOF
 y
 y
 oddCI$n
@@ -17,7 +21,7 @@ EOF
 
 # Then the transition calculations
 
-mpirun -np 34 rtransition_mpi > out_transition <<EOF
+mpirun -np "$MPI_TASKS" rtransition_mpi > out_transition <<EOF
 y
 y
 oddCI$n

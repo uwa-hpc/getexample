@@ -8,7 +8,7 @@
 # on Kaya using the GNU environment.
 
 # Copy the GRASP testcase directory to the current directory.
-cp -r "$GE_DIR/src/grasp" .
+cp -r "$GE_DIR/src/grasp" . || exit 1
 
 # The General Relativistic Atomic Structure Package (GRASP)
 # is a set of Fortran 90 programs for performing fully
@@ -20,11 +20,11 @@ cp -r "$GE_DIR/src/grasp" .
 # Load the GNU compiler, OpenMPI and LAPACK modules.
 module load gcc/14.3.0 openmpi/5.0.5 lapack/3.12.1
 
-# The calculation scripts launch the GRASP MPI programs
-# using mpirun with 34 processes.
+# The calculation scripts obtain the MPI process count
+# from the SLURM allocation through SLURM_NTASKS.
 
 # Submit the job to Kaya and capture the job ID.
-jobid=$(sbatch --parsable grasp_mpi.slurm)
+jobid=$(sbatch --parsable grasp_mpi.slurm) || exit 1
 
 echo "The job has been submitted."
 echo "Job ID: ${jobid}"
