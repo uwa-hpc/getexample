@@ -24,14 +24,14 @@ RESULTS=$MYGROUP/fortran_helloOpenMP_gnu_results/$SLURM_JOBID
 if [ ! -d $SCRATCH ]; then 
     mkdir -p $SCRATCH 
 fi 
-echo SCRATCH is $SCRATCH
+printf 'SCRATCH is %s\n' "$SCRATCH"
 
 ###############################################
 # Creates a unique directory in your GROUP directory for the results of this job
 if [ ! -d $RESULTS ]; then 
     mkdir -p $RESULTS 
 fi
-echo the results directory is $RESULTS
+printf 'the results directory is %s\n' "$RESULTS"
 
 ################################################
 # declare the name of the output file or log file
@@ -51,11 +51,11 @@ export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
 if [ $? -ne 0 ]; then
     cd
     OUTPUT2=kaya_results.log
-    echo "$EXECUTABLE with jobID $SLURM_JOBID Failed" >> ${OUTPUT2}
+    printf '%s with jobID %s Failed\n' "$EXECUTABLE" "$SLURM_JOBID" >> "${OUTPUT2}"
 else
     cd
     OUTPUT2=kaya_results.log
-    echo "$EXECUTABLE with jobID $SLURM_JOBID Succeeded" >> ${OUTPUT2}
+    printf '%s with jobID %s Succeeded\n' "$EXECUTABLE" "$SLURM_JOBID" >> "${OUTPUT2}"
 fi
 
 cd $SCRATCH
@@ -72,4 +72,4 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo fortran_helloOpenMP_gnu job finished at `date`
+printf 'fortran_helloOpenMP_gnu job finished at %s\n' "$(date)"
