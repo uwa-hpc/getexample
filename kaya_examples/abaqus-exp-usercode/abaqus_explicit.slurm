@@ -33,19 +33,19 @@ unset SLURM_GTIDS
 if [ ! -d $SCRATCH ]; then 
     mkdir -p $SCRATCH 
 fi 
-echo SCRATCH is $SCRATCH
+printf 'SCRATCH is %s\n' "$SCRATCH"
 
 ###############################################
 # Creates a unique directory in your GROUP directory for the results of this job
 if [ ! -d $RESULTS ]; then 
     mkdir -p $RESULTS 
 fi
-echo the results directory is $RESULTS
+printf 'the results directory is %s\n' "$RESULTS"
 
 #############################################
 # Copy input files and user subroutine to $SCRATCH
 # then change directory to $SCRATCH
-echo "current directory is "`pwd`
+printf 'current directory is  %s\n' "$(pwd)"
 cp ${INPUT}*.inp $SCRATCH/.
 cp ${USER_ROUTINE}.f $SCRATCH/.
 cd $SCRATCH
@@ -64,9 +64,9 @@ for host in ${node_list}; do
     mp_host_list="${mp_host_list}['$host', ${SLURM_CPUS_ON_NODE}],"
 done
 
-mp_host_list=$(echo ${mp_host_list} | sed -e "s/,$/]/")
+mp_host_list=$(printf '%s\n' "$mp_host_list" | sed -e "s/,$/]/")
 
-echo "mp_host_list=${mp_host_list}" >> ${env_file}
+printf 'mp_host_list=%s\n' "$mp_host_list" >> "$env_file"
 
 export OMP_NUM_THREADS=1
 
@@ -76,11 +76,11 @@ abaqus interactive job=${INPUT}_cps4r_xpl cpus=${SLURM_NTASKS} \
 if [ $? -ne 0 ]; then
     cd
     OUTPUT2=kaya_results.log
-    echo "abaqus-exp-usercode (${INPUT}_cps4r_xpl) with jobID $SLURM_JOBID Failed" >> ${OUTPUT2}
+    printf 'abaqus-exp-usercode (%s_cps4r_xpl) with jobID %s Failed\n' "$INPUT" "$SLURM_JOBID" >> "$OUTPUT2"
 else
     cd
     OUTPUT2=kaya_results.log
-    echo "abaqus-exp-usercode (${INPUT}_cps4r_xpl) with jobID $SLURM_JOBID Succeeded" >> ${OUTPUT2}
+    printf 'abaqus-exp-usercode (%s_cps4r_xpl) with jobID %s Succeeded\n' "$INPUT" "$SLURM_JOBID" >> "$OUTPUT2"
 fi
 
 cd $SCRATCH
@@ -95,4 +95,4 @@ cd $HOME
 # Clean up $SCRATCH
 rm -r $SCRATCH
 
-echo abaqus explicit user fortran job finished at `date`
+printf 'abaqus explicit user fortran job finished at %s\n' "$(date)"
