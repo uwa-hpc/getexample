@@ -2,7 +2,7 @@
 # This is the README file is an executable script.
 # To run type: ./README
 #
-# Example OBJECTIVE: to demonstrate hello_mpi.f90 example on 
+# Example OBJECTIVE: to demonstrate hello_mpi.f90 example on
 # Kaya with GNU environment across two partially occupied nodes.
 # hello_mpi.f90 is an MPI code which runs on 2 nodes
 # with 12 MPI tasks on each node (6 per socket).
@@ -30,32 +30,32 @@ mpif90 -O2 hello_mpi.f90 -o hellompi_partial_gnu
 
 # To submit the job to Kaya
 jobid=$(sbatch --parsable hellompi_partial_gnu.slurm)
-echo ""
-echo "The sbatch command returns what the jobid is for this job."
-echo "To check the status of your job, use the slurm command:"
-echo "squeue -u $USER"
-echo " "
-echo "Your job will be run in $MYSCRATCH/run_partially_occupied_nodes_gnu/${jobid}."
-echo " "
-echo "Your results will be saved in ${MYGROUP}/partially_occupied_nodes_gnu_results/${jobid}"
-echo "and the scratch directory will then be deleted."
-echo " "
-echo "To check the results change to your jobid directory, type:"
-echo "cd ${MYGROUP}/partially_occupied_nodes_gnu_results/${jobid}"
-echo " " 
-echo "To view the results, use the cat command and type:"
-echo "cat partially_occupied_nodes_gnu.log"
-echo " "
-echo " Kaya user shortcuts! " 
-echo  '$MYSCRATCH' "is an environment variable it is set to $MYSCRATCH"
-echo  '$MYGROUP' "is an environment variable it is set to $MYGROUP"
-echo " example:  cd \$MYGROUP "
+printf '%s\n' ""
+printf '%s\n' "The sbatch command returns what the jobid is for this job."
+printf '%s\n' "To check the status of your job, use the slurm command:"
+printf '%s\n' "squeue -u $USER"
+printf '%s\n' " "
+printf '%s\n' "Your job will be run in $MYSCRATCH/run_partially_occupied_nodes_gnu/${jobid}."
+printf '%s\n' " "
+printf '%s\n' "Your results will be saved in ${MYGROUP}/partially_occupied_nodes_gnu_results/${jobid}"
+printf '%s\n' "and the scratch directory will then be deleted."
+printf '%s\n' " "
+printf '%s\n' "To check the results change to your jobid directory, type:"
+printf '%s\n' "cd ${MYGROUP}/partially_occupied_nodes_gnu_results/${jobid}"
+printf '%s\n' " "
+printf '%s\n' "To view the results, use the cat command and type:"
+printf '%s\n' "cat partially_occupied_nodes_gnu.log"
+printf '%s\n' " "
+printf '%s\n' " Kaya user shortcuts! "
+printf '%s %s\n' '$MYSCRATCH' "is an environment variable it is set to $MYSCRATCH"
+printf '%s %s\n' '$MYGROUP' "is an environment variable it is set to $MYGROUP"
+printf '%s\n' " example:  cd \$MYGROUP "
 
-echo " "  
-echo "more information about Kaya can be found at:"
-echo " https://docs.hpc.uwa.edu.au/docs"
-echo " "
-echo "more information about SLURM and srun can be found at:"
-echo " https://docs.hpc.uwa.edu.au/docs/slurm"
-echo " "
-echo " "
+printf '%s\n' " "
+printf '%s\n' "more information about Kaya can be found at:"
+printf '%s\n' " https://docs.hpc.uwa.edu.au/docs"
+printf '%s\n' " "
+printf '%s\n' "more information about SLURM and srun can be found at:"
+printf '%s\n' " https://docs.hpc.uwa.edu.au/docs/slurm"
+printf '%s\n' " "
+printf '%s\n' " "
