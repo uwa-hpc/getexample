@@ -17,29 +17,29 @@
 # Submit the job to Kaya.
 jobid=$(sbatch --parsable lammps_mpi_gnu.slurm) || exit 1
 
-echo " "
-echo "The job has been submitted."
-echo "Job ID: ${jobid}"
-echo " "
-echo "To check the job status, use:"
-echo "squeue -u $USER"
-echo " "
-echo "Your job will run in:"
-echo "$MYSCRATCH/run_lammps/${jobid}"
-echo " "
-echo "Your results will be saved in:"
-echo "$MYGROUP/lmp_results/${jobid}"
-echo " "
-echo "To view the results, use:"
-echo "cat $MYGROUP/lmp_results/${jobid}/lammps.log"
-echo " "
-echo "Kaya user shortcuts:"
-echo '$MYSCRATCH is set to' "$MYSCRATCH"
-echo '$MYGROUP is set to' "$MYGROUP"
-echo " "
-echo "More information about Kaya:"
-echo "https://docs.hpc.uwa.edu.au/docs"
-echo " "
-echo "More information about Slurm:"
-echo "https://docs.hpc.uwa.edu.au/docs/slurm"
-echo " "
+printf '\n'
+printf '%s\n' "The job has been submitted."
+printf '%s\n' "Job ID: ${jobid}"
+printf '\n'
+printf '%s\n' "To check the job status, use:"
+printf '%s\n' "squeue -u $USER"
+printf '\n'
+printf '%s\n' "Your job will run in:"
+printf '%s\n' "$MYSCRATCH/run_lammps/${jobid}"
+printf '\n'
+printf '%s\n' "Your results will be saved in:"
+printf '%s\n' "$MYGROUP/lmp_results/${jobid}"
+printf '\n'
+printf '%s\n' "To view the results, use:"
+printf '%s\n' "cat $MYGROUP/lmp_results/${jobid}/lammps.log"
+printf '\n'
+printf '%s\n' "Kaya user shortcuts:"
+printf '%s %s\n' '$MYSCRATCH is set to' "$MYSCRATCH"
+printf '%s %s\n' '$MYGROUP is set to' "$MYGROUP"
+printf '\n'
+printf '%s\n' "More information about Kaya:"
+printf '%s\n' "https://docs.hpc.uwa.edu.au/docs"
+printf '\n'
+printf '%s\n' "More information about Slurm:"
+printf '%s\n' "https://docs.hpc.uwa.edu.au/docs/slurm"
+printf '\n'
