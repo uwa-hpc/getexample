@@ -1,4 +1,3 @@
-
 #!/bin/bash --login
 #SBATCH --job-name=GE-hello_NUMA_intel
 #SBATCH --partition=work
@@ -22,11 +21,11 @@ RESULTS=$MYGROUP/hello_NUMA_intel_results/$SLURM_JOBID
 
 # Create scratch directory
 mkdir -p "$SCRATCH"
-echo "SCRATCH is $SCRATCH"
+printf '%s\n' "SCRATCH is $SCRATCH"
 
 # Create results directory
 mkdir -p "$RESULTS"
-echo "Results directory is $RESULTS"
+printf '%s\n' "Results directory is $RESULTS"
 
 # Output log file
 OUTPUT=hello_NUMA_intel.log
@@ -40,8 +39,8 @@ cd "$SCRATCH" || exit 1
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
 export KMP_AFFINITY="granularity=fine,compact"
 
-echo "Number of threads is $OMP_NUM_THREADS"
-echo "Intel affinity: $KMP_AFFINITY"
+printf '%s\n' "Number of threads is $OMP_NUM_THREADS"
+printf '%s\n' "Intel affinity: $KMP_AFFINITY"
 
 # Run with Slurm-managed CPU binding
 srun --cpu-bind=verbose,cores ./$EXECUTABLE >> "$OUTPUT"
@@ -51,9 +50,9 @@ EXIT_STATUS=$?
 cd "$HOME" || exit 1
 
 if [ "$EXIT_STATUS" -ne 0 ]; then
-    echo "$EXECUTABLE with jobID $SLURM_JOBID Failed" >> kaya_results.log
+    printf '%s\n' "$EXECUTABLE with jobID $SLURM_JOBID Failed" >> kaya_results.log
 else
-    echo "$EXECUTABLE with jobID $SLURM_JOBID Succeeded" >> kaya_results.log
+    printf '%s\n' "$EXECUTABLE with jobID $SLURM_JOBID Succeeded" >> kaya_results.log
 fi
 
 # Move output to results directory
@@ -62,4 +61,4 @@ mv "$SCRATCH/$OUTPUT" "$RESULTS/"
 # Clean up scratch directory
 rm -r "$SCRATCH"
 
-echo "hello_NUMA_intel job finished at $(date)"
+printf '%s\n' "hello_NUMA_intel job finished at $(date)"

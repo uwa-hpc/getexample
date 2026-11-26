@@ -25,31 +25,31 @@ icx -O2 -qopenmp omp_hello.c -o hello_numa_intel
 # To submit the job to Kaya
 jobid=$(sbatch --parsable hello_numa_intel.slurm)
 
-echo ""
-echo "The sbatch command returns the job ID."
-echo "To check the status of your job, use:"
-echo "squeue -u $USER"
-echo ""
-echo "Your job will run in:"
-echo "$MYSCRATCH/run_hello_NUMA_intel/${jobid}"
-echo ""
-echo "Your results will be saved in:"
-echo "${MYGROUP}/hello_NUMA_intel_results/${jobid}"
-echo "The scratch directory will then be deleted."
-echo ""
-echo "To check the results, change to your job directory:"
-echo "cd ${MYGROUP}/hello_NUMA_intel_results/${jobid}"
-echo ""
-echo "To view the results:"
-echo "cat hello_NUMA_intel.log"
-echo ""
-echo "Kaya user shortcuts:"
-echo '$MYSCRATCH' "is set to $MYSCRATCH"
-echo '$MYGROUP' "is set to $MYGROUP"
-echo ""
-echo "More information about Kaya:"
-echo "https://docs.hpc.uwa.edu.au/docs"
-echo ""
-echo "More information about Slurm:"
-echo "https://docs.hpc.uwa.edu.au/docs/slurm"
-echo ""
+printf '\n'
+printf '%s\n' "The sbatch command returns the job ID."
+printf '%s\n' "To check the status of your job, use:"
+printf '%s\n' "squeue -u $USER"
+printf '\n'
+printf '%s\n' "Your job will run in:"
+printf '%s\n' "$MYSCRATCH/run_hello_NUMA_intel/${jobid}"
+printf '\n'
+printf '%s\n' "Your results will be saved in:"
+printf '%s\n' "${MYGROUP}/hello_NUMA_intel_results/${jobid}"
+printf '%s\n' "The scratch directory will then be deleted."
+printf '\n'
+printf '%s\n' "To check the results, change to your job directory:"
+printf '%s\n' "cd ${MYGROUP}/hello_NUMA_intel_results/${jobid}"
+printf '\n'
+printf '%s\n' "To view the results:"
+printf '%s\n' "cat hello_NUMA_intel.log"
+printf '\n'
+printf '%s\n' "Kaya user shortcuts:"
+printf '%s %s\n' '$MYSCRATCH' "is set to $MYSCRATCH"
+printf '%s %s\n' '$MYGROUP' "is set to $MYGROUP"
+printf '\n'
+printf '%s\n' "More information about Kaya:"
+printf '%s\n' "https://docs.hpc.uwa.edu.au/docs"
+printf '\n'
+printf '%s\n' "More information about Slurm:"
+printf '%s\n' "https://docs.hpc.uwa.edu.au/docs/slurm"
+printf '\n'
