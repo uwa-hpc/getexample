@@ -34,14 +34,14 @@ RESULTS=$MYGROUP/orca_results
 if [ ! -d $SCRATCH ]; then 
     mkdir -p $SCRATCH 
 fi 
-echo SCRATCH is $SCRATCH
+printf '%s\n' "SCRATCH is $SCRATCH"
 
 ###############################################
 # Creates a unique directory in your GROUP directory for the results of this job
 if [ ! -d $RESULTS ]; then 
     mkdir -p $RESULTS 
 fi 
-echo the results directory is $RESULTS
+printf '%s\n' "the results directory is $RESULTS"
 
 ################################################
 # declare the name of the output file or log file
@@ -55,7 +55,7 @@ cp ${INPUT}.inp $SCRATCH
 
 cd $SCRATCH
 ls -al 
-echo 'number of cpus or tasks is:'  ${SLURM_NTASKS}
+printf '%s %s\n' 'number of cpus or tasks is:' "${SLURM_NTASKS}"
 
 # Note: ORCA manages its own MPI workers based on %pal nprocs in water.inp,
 # so invoke the orca executable directly (do not prefix with mpirun).
@@ -64,11 +64,11 @@ ${MAALI_ORCA_HOME}/orca ${INPUT}.inp > ${OUTPUT}
 if [ $? -ne 0 ]; then
     cd
     OUTPUT2=kaya_results.log
-    echo "orca (${INPUT}) with jobID $SLURM_JOBID Failed" >> ${OUTPUT2}
+    printf '%s\n' "orca (${INPUT}) with jobID $SLURM_JOBID Failed" >> ${OUTPUT2}
 else
     cd
     OUTPUT2=kaya_results.log
-    echo "orca (${INPUT}) with jobID $SLURM_JOBID Succeeded" >> ${OUTPUT2}
+    printf '%s\n' "orca (${INPUT}) with jobID $SLURM_JOBID Succeeded" >> ${OUTPUT2}
 fi
 
 cd $SCRATCH
@@ -86,4 +86,4 @@ if [ -d $SCRATCH ]; then
     rm -r $SCRATCH
 fi 
 
-echo orca job on kaya finished at  `date`
+printf 'orca job on kaya finished at %s\n' "$(date)"
