@@ -34,12 +34,12 @@ SOURCE_DIR="${SLURM_SUBMIT_DIR}/../../src/swash"
 ###############################################
 # Create a unique scratch directory
 mkdir -p "$SCRATCH"
-echo "SCRATCH is $SCRATCH"
+printf "%s\n" "SCRATCH is $SCRATCH"
 
 ###############################################
 # Create a unique results directory
 mkdir -p "$RESULTS"
-echo "The results directory is $RESULTS"
+printf "%s\n" "The results directory is $RESULTS"
 
 ################################################
 # Declare the output log filename
@@ -55,7 +55,7 @@ export OMP_NUM_THREADS
 
 cd "$SLURM_SUBMIT_DIR" || exit 1
 
-echo "Current directory is $(pwd)"
+printf "%s\n" "Current directory is $(pwd)"
 
 cp "$SOURCE_DIR/${case_name}.bot" "$SCRATCH/" || exit 1
 cp "$SOURCE_DIR/${case_name}.wlv" "$SCRATCH/" || exit 1
@@ -81,4 +81,4 @@ cd "$HOME" || exit 1
 
 rm -r "$SCRATCH"
 
-echo "SWASH job finished at $(date)"
+printf "%s\n" "SWASH job finished at $(date)"
