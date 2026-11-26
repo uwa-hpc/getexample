@@ -29,32 +29,32 @@ icx -O2 -qopenmp omp_hello.c -o hello_omp_intel
 
 # To submit the job to Kaya
 jobid=$(sbatch --parsable hello_omp_intel.slurm)
-echo ""
-echo "The sbatch command returns what the jobid is for this job."
-echo "To check the status of your job, use the slurm command:"
-echo "squeue -u $USER"
-echo " "
-echo "Your job will be run in $MYSCRATCH/run_helloOmp_intelC/${jobid}."
-echo " "
-echo "Your results will be saved in ${MYGROUP}/helloOmp_intelC_results/${jobid}"
-echo "and the scratch directory will then be deleted."
-echo " "
-echo "To check the results change to your jobid directory, type:"
-echo "cd ${MYGROUP}/helloOmp_intelC_results/${jobid}"
-echo " " 
-echo "To view the results, use the cat command and type:"
-echo "cat helloOmp_intelC.log"
-echo " "
-echo " Kaya user shortcuts! " 
-echo  '$MYSCRATCH' "is an environment variable it is set to $MYSCRATCH"
-echo  '$MYGROUP' "is an environment variable it is set to $MYGROUP"
-echo " example:  cd \$MYGROUP "
+printf '\n'
+printf '%s\n' "The sbatch command returns what the jobid is for this job."
+printf '%s\n' "To check the status of your job, use the slurm command:"
+printf '%s\n' "squeue -u $USER"
+printf '\n'
+printf '%s\n' "Your job will be run in $MYSCRATCH/run_helloOmp_intelC/${jobid}."
+printf '\n'
+printf '%s\n' "Your results will be saved in ${MYGROUP}/helloOmp_intelC_results/${jobid}"
+printf '%s\n' "and the scratch directory will then be deleted."
+printf '\n'
+printf '%s\n' "To check the results change to your jobid directory, type:"
+printf '%s\n' "cd ${MYGROUP}/helloOmp_intelC_results/${jobid}"
+printf '\n'
+printf '%s\n' "To view the results, use the cat command and type:"
+printf '%s\n' "cat helloOmp_intelC.log"
+printf '\n'
+printf '%s\n' " Kaya user shortcuts! "
+printf '%s %s\n' '$MYSCRATCH' "is an environment variable it is set to $MYSCRATCH"
+printf '%s %s\n' '$MYGROUP' "is an environment variable it is set to $MYGROUP"
+printf '%s\n' " example:  cd \$MYGROUP "
 
-echo " "  
-echo "more information about Kaya can be found at:"
-echo " https://docs.hpc.uwa.edu.au/docs"
-echo " "
-echo "more information about SLURM and srun can be found at:"
-echo " https://docs.hpc.uwa.edu.au/docs/slurm"
-echo " "
-echo " "
+printf '\n'
+printf '%s\n' "more information about Kaya can be found at:"
+printf '%s\n' " https://docs.hpc.uwa.edu.au/docs"
+printf '\n'
+printf '%s\n' "more information about SLURM and srun can be found at:"
+printf '%s\n' " https://docs.hpc.uwa.edu.au/docs/slurm"
+printf '\n'
+printf '\n'
