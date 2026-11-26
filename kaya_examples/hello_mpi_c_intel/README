@@ -10,7 +10,7 @@
 cp $GE_DIR/src/hello_mpi.c .
 
 
-# hello_mpi.c is an MPI code that runs on 1 node 
+# hello_mpi.c is an MPI code that runs on 1 node
 # with 36 MPI tasks on the node.
 # To run this code, we need to specify the total number of MPI tasks
 # and the number of MPI tasks per node.
@@ -18,7 +18,7 @@ cp $GE_DIR/src/hello_mpi.c .
 # You can edit the SLURM as: emacs hello_mpi_intel.slurm &
 
 # SLURM directives
-# 
+#
 # Here we specify to SLURM we want 1 node (--nodes=1)
 # To compile hello_mpi.c with Intel, we load the Intel compiler and MPI:
 module use /uwahpc/rocky9/modulefiles/intel/2023.0
@@ -32,33 +32,33 @@ mpiicc -O2 hello_mpi.c -o hello_mpi_intel
 
 # To submit the job to Kaya
 jobid=$(sbatch --parsable hello_mpi_intel.slurm)
-echo ""
-echo "The sbatch command returns what the jobid is for this job."
-echo "To check the status of your job, use the slurm command:"
-echo "squeue -u $USER"
-echo " "
-echo "Your job will be run in $MYSCRATCH/run_hello_mpi_c_intel/${jobid}."
-echo " "
-echo "Your results will be saved in ${MYGROUP}/hello_mpi_c_intel_results/${jobid}"
-echo "and the scratch directory will then be deleted."
-echo " "
-echo "To check the results change to your jobid directory, type:"
-echo "cd ${MYGROUP}/hello_mpi_c_intel_results/${jobid}"
-echo " " 
-echo "To view the results, use the cat command and type:"
-echo "cat hello_mpi_c_intel.log"
-echo " "
-echo " Kaya user shortcuts! " 
-echo  '$MYSCRATCH' "is an environment variable it is set to $MYSCRATCH"
-echo  '$MYGROUP' "is an environment variable it is set to $MYGROUP"
-echo " example:  cd \$MYGROUP "
+printf '%s\n' ""
+printf '%s\n' "The sbatch command returns what the jobid is for this job."
+printf '%s\n' "To check the status of your job, use the slurm command:"
+printf '%s\n' "squeue -u $USER"
+printf '%s\n' " "
+printf '%s\n' "Your job will be run in $MYSCRATCH/run_hello_mpi_c_intel/${jobid}."
+printf '%s\n' " "
+printf '%s\n' "Your results will be saved in ${MYGROUP}/hello_mpi_c_intel_results/${jobid}"
+printf '%s\n' "and the scratch directory will then be deleted."
+printf '%s\n' " "
+printf '%s\n' "To check the results change to your jobid directory, type:"
+printf '%s\n' "cd ${MYGROUP}/hello_mpi_c_intel_results/${jobid}"
+printf '%s\n' " "
+printf '%s\n' "To view the results, use the cat command and type:"
+printf '%s\n' "cat hello_mpi_c_intel.log"
+printf '%s\n' " "
+printf '%s\n' " Kaya user shortcuts! "
+printf '%s %s\n' '$MYSCRATCH' "is an environment variable it is set to $MYSCRATCH"
+printf '%s %s\n' '$MYGROUP' "is an environment variable it is set to $MYGROUP"
+printf '%s\n' " example:  cd \$MYGROUP "
 
 
-echo " "  
-echo "more information about Kaya can be found at:"
-echo " https://docs.hpc.uwa.edu.au/docs"
-echo " "
-echo "more information about SLURM and srun can be found at:"
-echo " https://docs.hpc.uwa.edu.au/docs/slurm"
-echo " "
-echo " "
+printf '%s\n' " "
+printf '%s\n' "more information about Kaya can be found at:"
+printf '%s\n' " https://docs.hpc.uwa.edu.au/docs"
+printf '%s\n' " "
+printf '%s\n' "more information about SLURM and srun can be found at:"
+printf '%s\n' " https://docs.hpc.uwa.edu.au/docs/slurm"
+printf '%s\n' " "
+printf '%s\n' " "
