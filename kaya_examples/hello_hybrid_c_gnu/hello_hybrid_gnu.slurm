@@ -25,14 +25,14 @@ RESULTS=$MYGROUP/hello_hybrid_c_gnu_results/$SLURM_JOBID
 if [ ! -d $SCRATCH ]; then 
     mkdir -p $SCRATCH 
 fi 
-echo SCRATCH is $SCRATCH
+printf 'SCRATCH is %s\n' "$SCRATCH"
 
 ###############################################
 # Creates a unique directory in your GROUP directory for the results of this job
 if [ ! -d $RESULTS ]; then 
     mkdir -p $RESULTS 
 fi
-echo the results directory is $RESULTS
+printf 'the results directory is %s\n' "$RESULTS"
 
 ################################################
 # declare the name of the output file or log file
@@ -47,17 +47,17 @@ cp $EXECUTABLE $SCRATCH
 cd $SCRATCH
 
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
-echo "Number of threads is $OMP_NUM_THREADS"
+printf 'Number of threads is %s\n' "$OMP_NUM_THREADS"
 mpirun -np $SLURM_NTASKS --bind-to none -x OMP_NUM_THREADS ./${EXECUTABLE} >> ${OUTPUT}
 
 if [ $? -ne 0 ]; then
     cd
     OUTPUT2=kaya_results.log
-    echo "$EXECUTABLE with jobID $SLURM_JOBID Failed" >> ${OUTPUT2}
+    printf '%s\n' "$EXECUTABLE with jobID $SLURM_JOBID Failed" >> ${OUTPUT2}
 else
     cd
     OUTPUT2=kaya_results.log
-    echo "$EXECUTABLE with jobID $SLURM_JOBID Succeeded" >> ${OUTPUT2}
+    printf '%s\n' "$EXECUTABLE with jobID $SLURM_JOBID Succeeded" >> ${OUTPUT2}
 fi
 
 cd $SCRATCH
@@ -74,4 +74,4 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo hello_hybrid_c_gnu job finished at `date`
+printf 'hello_hybrid_c_gnu job finished at %s\n' "$(date)"
