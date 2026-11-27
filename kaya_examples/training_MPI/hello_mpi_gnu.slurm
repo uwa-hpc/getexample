@@ -1,19 +1,18 @@
 #!/bin/bash -l
 #SBATCH --job-name=GE-fortranMPI_gnu
-#SBATCH --partition=test
+#SBATCH --partition=work
 #SBATCH --nodes=2
 #SBATCH --ntasks=20
 #SBATCH --ntasks-per-node=10
 #SBATCH --cpus-per-task=1
 #SBATCH --time=00:02:00
-#SBATCH --export=NONE
+#SBATCH --export=ALL
 
-#SBATCH --account=training
 # to not share nodes with other running jobs use #SBATCH -exclusive
 
 
 # To load the GNU toolchain
-module load gcc/9.4.0 openmpi/4.1.3
+module load gcc/14.3.0 openmpi/5.0.5
 
 # leave in, it lists the environment loaded by the modules
 module list
@@ -30,14 +29,14 @@ export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
 if [ ! -d $SCRATCH ]; then 
     mkdir -p $SCRATCH 
 fi 
-echo SCRATCH is $SCRATCH
+printf 'SCRATCH is %s\n' "$SCRATCH"
 
 ###############################################
 # Creates a unique directory in your GROUP directory for the results of this job
 if [ ! -d $RESULTS ]; then 
     mkdir -p $RESULTS 
 fi
-echo the results directory is $RESULTS
+printf 'the results directory is %s\n' "$RESULTS"
 
 ################################################
 # declare the name of the output file or log file
@@ -51,6 +50,7 @@ cd ${SLURM_SUBMIT_DIR}
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
+ls -al
 
 #srun --mpi=pmix_v3 ./${EXECUTABLE} >> ${OUTPUT}
 mpirun -np 20 ./${EXECUTABLE} >> ${OUTPUT}
@@ -67,6 +67,6 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo fortranMPI_gnu job finished at  `date`
+printf 'fortranMPI_gnu job finished at %s\n' "$(date)"
 
 

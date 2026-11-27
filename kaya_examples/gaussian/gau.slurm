@@ -5,8 +5,7 @@
 #SBATCH --ntasks=16
 # -N is equivalent to --nodes
 # -n is equivalent to --ntasks
-# max ntasks = 1
-# note ntasks has to match %proc in your gaussian input file
+# note ntasks has to match %nprocshared in your gaussian input file (or pass -p)
 #SBATCH --mem-per-cpu=4GB
 # the default is 1G per cpu(core)
 # HINT!
@@ -38,44 +37,50 @@ export OMP_NUM_THREADS=1
 if [ ! -d $SCRATCH ]; then 
     mkdir -p $SCRATCH 
 fi 
-echo SCRATCH is $SCRATCH
-echo GAUSS_SCRDIR is "${SCRATCH}"
+printf "SCRATCH is %s\n" "$SCRATCH"
+printf "GAUSS_SCRDIR is %s\n" "$SCRATCH"
 ###############################################
 # Creates a unique directory in your GROUP directory for the results of this job
 if [ ! -d $RESULTS ]; then 
     mkdir -p $RESULTS 
 fi
-echo the results directory is $RESULTS
-
-################################################
-# declare the name of the output file or log file
-OUTPUT=gau_${INPUT}.log
+printf "the results directory is %s\n" "$RESULTS"
 
 #############################################
 #   Copy input files to $SCRATCH
 #   then change directory to $SCRATCH
 cd ${SLURM_SUBMIT_DIR}
-echo "### current directory is "`pwd`
+printf "### current directory is %s\n" "$(pwd)"
 cp ${INPUT}.com ${SCRATCH}
 
 cd ${SCRATCH}
 
 ls -al
 
-#g16 -p=${SLURM_CPUS_PER_TASK} ${INPUT}.com > ${OUTPUT}
-g16 ${INPUT}.com 
+g16 ${INPUT}.com
+
+if [ $? -ne 0 ]; then
+    cd
+    OUTPUT2=kaya_results.log
+    printf "gaussian (%s) with jobID %s Failed\n" "$INPUT" "$SLURM_JOBID" >> ${OUTPUT2}
+else
+    cd
+    OUTPUT2=kaya_results.log
+    printf "gaussian (%s) with jobID %s Succeeded\n" "$INPUT" "$SLURM_JOBID" >> ${OUTPUT2}
+fi
+
+cd ${SCRATCH}
+
 #############################################
-# gaussian writes it own OUTPUT file to the unique results dir
-# note this can be a copy or move  
-mv  ${SCRATCH} ${RESULTS}
+# Gaussian writes ${INPUT}.log directly; move $SCRATCH to $RESULTS/$SLURM_JOBID
+mv ${SCRATCH} ${RESULTS}
 
 cd $HOME
 
 ###########################
-# Clean up $SCRATCH 
+# Clean up $SCRATCH if still present
+if [ -d $SCRATCH ]; then
+    rm -r $SCRATCH
+fi
 
-rm -r $SCRATCH
-
-echo gaussian job finished at  `date`
-
-
+printf "gaussian job finished at %s\n" "$(date)"

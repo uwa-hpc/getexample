@@ -10,8 +10,8 @@
 #SBATCH --mem-per-cpu=3G
 #SBATCH --export=NONE
 
-# 
-module load orca/5.0.2
+# Load the GNU compiler and ORCA 6.0.0 (which also loads openmpi/5.0.5)
+module load gcc/14.3.0 orca/6.0.0
 
 # leave in, it lists the environment loaded by the modules
 module list
@@ -34,14 +34,14 @@ RESULTS=$MYGROUP/orca_results
 if [ ! -d $SCRATCH ]; then 
     mkdir -p $SCRATCH 
 fi 
-echo SCRATCH is $SCRATCH
+printf '%s\n' "SCRATCH is $SCRATCH"
 
 ###############################################
 # Creates a unique directory in your GROUP directory for the results of this job
 if [ ! -d $RESULTS ]; then 
     mkdir -p $RESULTS 
 fi 
-echo the results directory is $RESULTS
+printf '%s\n' "the results directory is $RESULTS"
 
 ################################################
 # declare the name of the output file or log file
@@ -55,9 +55,24 @@ cp ${INPUT}.inp $SCRATCH
 
 cd $SCRATCH
 ls -al 
-echo 'number of cpus or tasks is:'  ${SLURM_NTASKS}
-#mpirun -np 16 ${MAALI_ORCA_HOME}/orca  ${INPUT}.inp > ${OUTPUT}
-${MAALI_ORCA_HOME}/orca  ${INPUT}.inp > ${OUTPUT}
+printf '%s %s\n' 'number of cpus or tasks is:' "${SLURM_NTASKS}"
+
+# Note: ORCA manages its own MPI workers based on %pal nprocs in water.inp,
+# so invoke the orca executable directly (do not prefix with mpirun).
+${MAALI_ORCA_HOME}/orca ${INPUT}.inp > ${OUTPUT}
+
+if [ $? -ne 0 ]; then
+    cd
+    OUTPUT2=kaya_results.log
+    printf '%s\n' "orca (${INPUT}) with jobID $SLURM_JOBID Failed" >> ${OUTPUT2}
+else
+    cd
+    OUTPUT2=kaya_results.log
+    printf '%s\n' "orca (${INPUT}) with jobID $SLURM_JOBID Succeeded" >> ${OUTPUT2}
+fi
+
+cd $SCRATCH
+
 #############################################
 # $OUTPUT file to the unique results dir
 # note this can be a copy or move  
@@ -71,6 +86,4 @@ if [ -d $SCRATCH ]; then
     rm -r $SCRATCH
 fi 
 
-echo orca job on kaya finished at  `date`
-
-
+printf 'orca job on kaya finished at %s\n' "$(date)"

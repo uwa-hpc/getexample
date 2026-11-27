@@ -2,9 +2,9 @@
 # This is the README file is an executable script.
 # To run type: ./README
 #
-# Example OBJECTIVE: to demonstrate helloworld.c example 
-# in GNU environment on Magnus.
-# helloworld.c is a simple c code that prints "Hello World!" 
+# Example OBJECTIVE: to demonstrate helloworld.c example
+# in GNU environment on Kaya.
+# helloworld.c is a simple c code that prints "Hello World!"
 # and runs on a single node.
 # cp the helloworld.c source code
 cp $GE_DIR/src/helloworld.c .
@@ -15,11 +15,11 @@ cp $GE_DIR/src/helloworld.c .
 # You can edit the SLURM as: emacs helloworld_gnu.slurm &
 
 # SLURM directives
-# 
+#
 # Here we specify to SLURM we want 1 node (--nodes=1)
-# To compile the code with the GNU environment, we load 
+# To compile the code with the GNU environment, we load
 # the gcc environment module as shown below:
-module load gcc 
+module load gcc/14.3.0
 # To run the code, we simply type:
 # srun -n 1 ./$EXECUTABLE >> ${OUTPUT}
 
@@ -29,31 +29,31 @@ gcc -O2 helloworld.c -o helloworld_gnu
 # To submit the job to kaya
 jobid=$(sbatch --parsable helloworld_gnu.slurm)
 
-echo "The sbatch command returns what the jobid is for this job."
-echo "To check the status of your job, use the slurm command:"
-echo "squeue -u $USER"
-echo " "
-echo "Your job will be run in $MYSCRATCH/run_helloC_gnu/${jobid}."
-echo " "
-echo "Your results will be saved in ${MYGROUP}/helloC_gnu_results/${jobid}"
-echo "and the scratch directory will then be deleted."
-echo " "
-echo "To check the results change to your jobid directory, type:"
-echo "cd ${MYGROUP}/helloC_gnu_results/${jobid}"
-echo " " 
-echo "To view the results, use the cat command and type:"
-echo "cat helloC_gnu.log"
-echo " "
-echo " PAWSEY user shortcuts! " 
-echo  '$MYSCRATCH' "is an environment variable it is set to $MYSCRATCH"
-echo  '$MYGROUP' "is an environment variable it is set to $MYGROUP"
-echo " example:  cd \$MYGROUP "
+printf '%s\n' "The sbatch command returns what the jobid is for this job."
+printf '%s\n' "To check the status of your job, use the slurm command:"
+printf '%s\n' "squeue -u $USER"
+printf '%s\n' " "
+printf '%s\n' "Your job will be run in $MYSCRATCH/run_helloC_gnu/${jobid}."
+printf '%s\n' " "
+printf '%s\n' "Your results will be saved in ${MYGROUP}/helloc_gnu_results/${jobid}"
+printf '%s\n' "and the scratch directory will then be deleted."
+printf '%s\n' " "
+printf '%s\n' "To check the results change to your jobid directory, type:"
+printf '%s\n' "cd ${MYGROUP}/helloc_gnu_results/${jobid}"
+printf '%s\n' " "
+printf '%s\n' "To view the results, use the cat command and type:"
+printf '%s\n' "cat helloC_gnu.log"
+printf '%s\n' " "
+printf '%s\n' " Kaya user shortcuts! "
+printf '%s is an environment variable it is set to %s\n' '$MYSCRATCH' "$MYSCRATCH"
+printf '%s is an environment variable it is set to %s\n' '$MYGROUP' "$MYGROUP"
+printf '%s\n' " example:  cd \$MYGROUP "
 
-echo " "  
-echo "more information about UWA HPC and Kaya can be found at:"
-echo " https://uniwa.sharepoint.com/teams/EXT-UWA-HPC"
-echo " "
-echo "more information about SLURM and srun can be found at:"
-echo " https://docs.hpc.uwa.edu.au/docs/"
-echo " "
-echo " "
+printf '%s\n' " "
+printf '%s\n' "more information about Kaya can be found at:"
+printf '%s\n' " https://docs.hpc.uwa.edu.au/docs"
+printf '%s\n' " "
+printf '%s\n' "more information about SLURM and srun can be found at:"
+printf '%s\n' " https://docs.hpc.uwa.edu.au/docs/slurm"
+printf '%s\n' " "
+printf '%s\n' " "

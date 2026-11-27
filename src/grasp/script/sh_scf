@@ -1,6 +1,10 @@
 #!/bin/sh
 set -x
 
+# Use the MPI task allocation provided by SLURM.
+: "${SLURM_NTASKS:?This script must run inside a SLURM job}"
+MPI_TASKS=$SLURM_NTASKS
+
 #   4.  Get results for odd n=3,4,5,6
 
 for n in 3 4 5 6
@@ -8,7 +12,7 @@ do
    (cp odd${n}.c rcsf.inp
 
 #  Get angular data
-mpirun -np 34 rangular_mpi <<S4
+mpirun -np "$MPI_TASKS" rangular_mpi <<S4
 y
 S4
 
@@ -25,7 +29,7 @@ odd${m}.w
 S5
 
 # Perform self-consistent field calculations
-mpirun -np 34 rmcdhf_mpi > outodd_rmcdhf_${n} <<S6
+mpirun -np "$MPI_TASKS" rmcdhf_mpi > outodd_rmcdhf_${n} <<S6
 y
 1
 1
@@ -55,7 +59,7 @@ n=6
 cp odd${n}.c oddCI${n}.c
 cp odd${n}.w oddCI${n}.w
 
-mpirun -np 34 rci_mpi > outodd_rci <<S7
+mpirun -np "$MPI_TASKS" rci_mpi > outodd_rci <<S7
 y
 oddCI${n}
 y
@@ -87,7 +91,7 @@ do
    (cp even${n}.c rcsf.inp
 
 #  Get angular data
-mpirun -np 34 rangular_mpi <<S4
+mpirun -np "$MPI_TASKS" rangular_mpi <<S4
 y
 S4
 
@@ -104,7 +108,7 @@ even${m}.w
 S5
 
 # Perform self-consistent field calculations
-mpirun -np 34 rmcdhf_mpi > outeven_rmcdhf_${n} <<S6
+mpirun -np "$MPI_TASKS" rmcdhf_mpi > outeven_rmcdhf_${n} <<S6
 y
 1,2,3
 1,2,3
@@ -136,7 +140,7 @@ n=6
 cp even${n}.c evenCI${n}.c
 cp even${n}.w evenCI${n}.w
 
-mpirun -np 34 rci_mpi > outeven_rci <<S7
+mpirun -np "$MPI_TASKS" rci_mpi > outeven_rci <<S7
 y
 evenCI${n}
 y
@@ -160,4 +164,3 @@ y
 y
 y
 S1
-

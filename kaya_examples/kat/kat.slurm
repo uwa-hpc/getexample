@@ -28,14 +28,14 @@ RESULTS=$MYGROUP/kat_results
 if [ ! -d $SCRATCH ]; then 
     mkdir -p $SCRATCH 
 fi 
-echo SCRATCH is $SCRATCH
+printf 'SCRATCH is %s\n' "$SCRATCH"
 
 ###############################################
 # Creates a unique directory in your GROUP directory for the results of this job
 if [ ! -d $RESULTS ]; then 
     mkdir -p $RESULTS 
 fi
-echo the results directory is $RESULTS
+printf 'the results directory is %s\n' "$RESULTS"
 
 ################################################
 # declare the name of the output file or log file
@@ -72,6 +72,6 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo kat job finished at  `date`
+printf 'kat job finished at %s\n' "$(date)"
 
 

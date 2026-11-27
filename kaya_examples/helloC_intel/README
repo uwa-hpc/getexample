@@ -1,0 +1,58 @@
+#!/bin/bash --login
+# This is the README file is an executable script.
+# To run type: ./README
+#
+# Example OBJECTIVE: to demonstrate helloworld.c example 
+# in Intel environment on Kaya.
+# helloworld.c is a simple C code that prints "Hello World!" 
+# and runs on a single node.
+# Copy the helloworld.c source code
+cp $GE_DIR/src/helloworld.c .
+
+# To run this code, we need to specify the number of nodes used.
+# This information is located under helloworld_intel.slurm
+# You can edit the SLURM script as: nano helloworld_intel.slurm
+
+# SLURM directives (set in helloworld_intel.slurm):
+# Here we specify to SLURM we want 1 node (--nodes=1) and 1 task (--ntasks=1).
+# Load the Intel oneAPI compiler environment:
+module use /uwahpc/rocky9/modulefiles/intel/2023.0
+module load compiler
+
+# Inside helloworld_intel.slurm, the executable is launched with:
+# srun --export=ALL -n 1 ./$EXECUTABLE >> ${OUTPUT}
+
+# To compile the helloworld.c code with Intel
+icx -O2 helloworld.c -o helloworld_intel
+
+# To submit the job to Kaya
+jobid=$(sbatch --parsable helloworld_intel.slurm)
+printf '\n'
+printf '%s\n' "The sbatch command returns what the jobid is for this job."
+printf '%s\n' "To check the status of your job, use the slurm command:"
+printf '%s\n' "squeue -u $USER"
+printf '%s\n' " "
+printf '%s\n' "Your job will be run in $MYSCRATCH/run_helloC_intel/${jobid}."
+printf '%s\n' " "
+printf '%s\n' "Your results will be saved in ${MYGROUP}/helloC_intel_results/${jobid}"
+printf '%s\n' "and the scratch directory will then be deleted."
+printf '%s\n' " "
+printf '%s\n' "To check the results change to your jobid directory, type:"
+printf '%s\n' "cd ${MYGROUP}/helloC_intel_results/${jobid}"
+printf '%s\n' " "
+printf '%s\n' "To view the results, use the cat command and type:"
+printf '%s\n' "cat helloC_intel.log"
+printf '%s\n' " "
+printf '%s\n' " Kaya user shortcuts! "
+printf '%s %s\n' '$MYSCRATCH' "is an environment variable it is set to $MYSCRATCH"
+printf '%s %s\n' '$MYGROUP' "is an environment variable it is set to $MYGROUP"
+printf '%s\n' " example:  cd \$MYGROUP "
+
+printf '%s\n' " "
+printf '%s\n' "more information about Kaya can be found at:"
+printf '%s\n' " https://docs.hpc.uwa.edu.au/docs"
+printf '%s\n' " "
+printf '%s\n' "more information about SLURM and srun can be found at:"
+printf '%s\n' " https://docs.hpc.uwa.edu.au/docs/slurm"
+printf '%s\n' " "
+printf '%s\n' " "

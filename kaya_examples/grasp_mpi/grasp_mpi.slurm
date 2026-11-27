@@ -1,66 +1,66 @@
 #!/bin/bash -l
 #SBATCH --job-name=GE-grasp
-#SBATCH --partition=test
+#SBATCH --partition=work
 #SBATCH --nodes=1
 #SBATCH --ntasks=34
 #SBATCH --time=02:00:00
 #SBATCH --export=ALL
 
-# To swap from Cray Environment to GNU
-module load gcc/8.3.1 openmpi/4.0.0 lapack/3.9.0
-
-# leave in, it lists the environment loaded by the modules
+# Load GNU compiler, OpenMPI and LAPACK
+module load gcc/14.3.0 openmpi/5.0.5 lapack/3.12.1
 module list
 
-#  Note: SLURM_JOBID is a unique number for every job.
-#  These are generic variables
+# GRASP executable and input directory
 EXECUTABLE=sh_case1
 INFILE=script
-SCRATCH=/tmp/$USER/run_grasp/$SLURM_JOBID
-RESULTS=$HOME/grasp_results/$SLURM_JOBID
+
+# GRASP software installation
 export GRASP=/group/ea001/cbording/grasp/grasp-2018-12-03
-export PATH=${GRASP}/bin:$PATH
-export LD_LIBRARY_PATH=${GRASP}/lib:${LD_LIBRARY_PATH}
-###############################################
-# Creates a unique directory in the SCRATCH directory for this job to run in.
-if [ ! -d $SCRATCH ]; then 
-    mkdir -p $SCRATCH 
-fi 
-echo SCRATCH is $SCRATCH
+export PATH="${GRASP}/bin:$PATH"
+export LD_LIBRARY_PATH="${GRASP}/lib:${LD_LIBRARY_PATH}"
 
-###############################################
-# Creates a unique directory in your GROUP directory for the results of this job
-if [ ! -d $RESULTS ]; then 
-    mkdir -p $RESULTS 
+# Scratch and results directories
+SCRATCH="$MYSCRATCH/run_grasp/$SLURM_JOBID"
+RESULTS="$MYGROUP/grasp_results/$SLURM_JOBID"
+
+mkdir -p "$SCRATCH" || exit 1
+mkdir -p "$RESULTS" || exit 1
+
+printf "Scratch directory: %s\n" "$SCRATCH"
+printf "Results directory: %s\n" "$RESULTS"
+printf "GRASP installation: %s\n" "$GRASP"
+
+# Check that the required GRASP executable exists
+if [ ! -x "$GRASP/bin/rangular_mpi" ]; then
+    printf "ERROR: GRASP MPI executables not found in %s\n" "$GRASP/bin"
+    exit 1
 fi
-echo the results directory is $RESULTS
-echo path is $PATH
-which rci 
-# declare the name of the output file or log file
+
+# Copy GRASP input files to scratch
+cd "$SLURM_SUBMIT_DIR" || exit 1
+cp -R "grasp/$INFILE" "$SCRATCH/" || exit 1
+
+cd "$SCRATCH/$INFILE" || exit 1
+
+# Run the GRASP calculation workflow.
+# sh_scf and sh_tr launch the MPI programs using SLURM_NTASKS.
 OUTPUT=case1_mpi.log
+"./$EXECUTABLE" > "$OUTPUT" 2>&1
+EXIT_STATUS=$?
 
-#############################################
-#   Copy input files to $SCRATCH
-#   then change directory to $SCRATCH
+# Record job outcome
+if [ "$EXIT_STATUS" -ne 0 ]; then
+    printf "GRASP job %s failed\n" "$SLURM_JOBID" >> "$HOME/kaya_results.log"
+else
+    printf "GRASP job %s succeeded\n" "$SLURM_JOBID" >> "$HOME/kaya_results.log"
+fi
 
-cp -R grasp/${INFILE} ${SCRATCH}
+# Save output
+mv "$OUTPUT" "$RESULTS/"
 
-cd $SCRATCH/${INFILE}
+# Clean up scratch
+cd "$HOME" || exit 1
+rm -rf "$SCRATCH"
 
-./$EXECUTABLE >> ${OUTPUT}
-
-#############################################
-#    $OUTPUT file to the unique results dir
-# note this can be a copy or move  
-mv  $OUTPUT ${RESULTS}
-
-cd $HOME
-
-###########################
-# Clean up $SCRATCH 
-
-rm -r $SCRATCH
-
-echo graspMPI job finished at  `date`
-
-
+printf "GRASP MPI job finished at %s\n" "$(date)"
+exit "$EXIT_STATUS"

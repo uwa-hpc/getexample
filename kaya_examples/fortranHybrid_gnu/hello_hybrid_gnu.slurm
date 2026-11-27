@@ -1,12 +1,15 @@
 #!/bin/bash --login
 #SBATCH --job-name=GE-fortranHybrid_gnu
-#SBATCH --partition=POPHEALTH
+#SBATCH --partition=work
 #SBATCH --nodes=1
+#SBATCH --ntasks=6
+#SBATCH --cpus-per-task=2
+#SBATCH --mem-per-cpu=4GB
 #SBATCH --time=00:05:00
-#SBATCH --export=NONE
+#SBATCH --export=ALL
 
-# To swap from Cray environment to GNU:
-module load gcc openmpi/4.0.0 
+# To load the GNU toolchain
+module load gcc/14.3.0 openmpi/5.0.5
 
 # leave in, it lists the environment loaded by the modules
 module list
@@ -14,22 +17,22 @@ module list
 #  Note: SLURM_JOBID is a unique number for every job.
 #  These are generic variables
 EXECUTABLE=hello_hybrid_gnu
-SCRATCH=/scratch/$USER/ge/run_fortranHybrid_gnu/$SLURM_JOBID
-RESULTS=$HOME/fortranhybrid_gnu_results/$SLURM_JOBID
+SCRATCH=$MYSCRATCH/run_fortranHybrid_gnu/$SLURM_JOBID
+RESULTS=$MYGROUP/fortranHybrid_gnu_results/$SLURM_JOBID
 
 ###############################################
 # Creates a unique directory in the SCRATCH directory for this job to run in.
 if [ ! -d $SCRATCH ]; then 
     mkdir -p $SCRATCH 
 fi 
-echo SCRATCH is $SCRATCH
+printf 'SCRATCH is %s\n' "$SCRATCH"
 
 ###############################################
 # Creates a unique directory in your GROUP directory for the results of this job
 if [ ! -d $RESULTS ]; then 
     mkdir -p $RESULTS 
 fi
-echo the results directory is $RESULTS
+printf 'the results directory is %s\n' "$RESULTS"
 
 ################################################
 # declare the name of the output file or log file
@@ -42,15 +45,28 @@ OUTPUT=fortranHybrid_gnu.log
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
+ls -al
 
-export OMP_NUM_THREADS=2
-echo "Number of threads is $OMP_NUM_THREADS"
-srun -n 6 ./$EXECUTABLE >> ${OUTPUT}
+export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
+printf "Number of threads is %s\n" "$OMP_NUM_THREADS"
+mpirun -np $SLURM_NTASKS --bind-to none -x OMP_NUM_THREADS ./${EXECUTABLE} >> ${OUTPUT}
+
+if [ $? -ne 0 ]; then
+    cd
+    OUTPUT2=kaya_results.log
+    printf '%s with jobID %s Failed\n' "$EXECUTABLE" "$SLURM_JOBID" >> "$OUTPUT2"
+else
+    cd
+    OUTPUT2=kaya_results.log
+    printf '%s with jobID %s Succeeded\n' "$EXECUTABLE" "$SLURM_JOBID" >> "$OUTPUT2"
+fi
+
+cd $SCRATCH
 
 #############################################
 #    $OUTPUT file to the unique results dir
 # note this can be a copy or move  
-mv  $OUTPUT ${RESULTS}
+cp  $OUTPUT ${RESULTS}
 
 cd $HOME
 
@@ -59,6 +75,4 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo fortranHybrid_gnu job finished at  `date`
-
-
+printf 'fortranHybrid_gnu job finished at %s\n' "$(date)"

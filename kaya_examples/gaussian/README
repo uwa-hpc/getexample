@@ -1,58 +1,55 @@
 #!/bin/bash --login
-# This is the README file is an executable script.
+# This README file is an executable script.
 # To run type: ./README
 #
-# Example OBJECTIVE: to demonstrate how to run an gaussian
-# example in with nvhpc(PGI) environment on Kaya.
-# 
-# and runs on a single node.
-# cp the input test file
+# Example OBJECTIVE: to demonstrate how to run a Gaussian
+# example in the nvhpc (PGI) environment on Kaya,
+# running on a single node.
+
+# Copy the input test file
 INPUT=test0135
 cp $GE_DIR/src/gaussian/${INPUT}.com .
 
-
 # To run this code, we need to specify the number of cores used.
 # This information is located in the slurm job script gau.slurm
-# You can edit the SLURM as: nano gau.slurm 
+# You can edit the SLURM file as: nano gau.slurm
 
 # SLURM directives
-# 
-# Here we specify to SLURM we want 1 node (--nodes=1)
-# 
-# Load the gaussian application into the environment as shown below:
+# Here we specify to SLURM we want 1 node (--nodes=1) and 16 tasks (--ntasks=16)
+# Load the Gaussian application into the environment as shown below:
 module load nvhpc/21.3 gaussian/g16.c02
 
-# To run the code, we simply type:
-# g16 ${INPUT}.com > ${OUTPUT}
+# Inside gau.slurm, Gaussian is launched with:
+# g16 -p=${SLURM_NTASKS} ${INPUT}.com
 
 # To submit the job to Kaya
 jobid=$(sbatch --parsable gau.slurm)
 
-echo "The sbatch command returns what the jobid is for this job."
-echo "To check the status of your job, use the slurm command:"
-echo "squeue -u $USER"
-echo " "
-echo "Your job will be run in $MYSCRATCH/run_gaussian/${jobid}."
-echo " "
-echo "Your results will be saved in ${MYGROUP}/gaussian_results/${jobid}"
-echo "and the scratch directory will then be deleted."
-echo " "
-echo "To check the results change to your jobid directory, type:"
-echo "cd ${MYGROUP}/gaussian_results/${jobid}"
-echo " " 
-echo "To view the results, use the cat command and type:"
-echo "cat ${INPUT}.com"
-echo " "
-echo " Kaya user shortcuts! " 
-echo  '$MYSCRATCH' "is an environment variable it is set to $MYSCRATCH"
-echo  '$MYGROUP' "is an environment variable it is set to $MYGROUP"
-echo " example:  cd \$MYGROUP "
+printf "%s\n" "The sbatch command returns what the jobid is for this job."
+printf "%s\n" "To check the status of your job, use the slurm command:"
+printf "%s\n" "squeue -u $USER"
+printf "%s\n" " "
+printf "%s\n" "Your job will be run in $MYSCRATCH/run_gaussian/${jobid}."
+printf "%s\n" " "
+printf "%s\n" "Your results will be saved in ${MYGROUP}/gaussian_results/${jobid}"
+printf "%s\n" "and the scratch directory will then be deleted."
+printf "%s\n" " "
+printf "%s\n" "To check the results change to your jobid directory, type:"
+printf "%s\n" "cd ${MYGROUP}/gaussian_results/${jobid}"
+printf "%s\n" " "
+printf "%s\n" "To view the results, use the cat command and type:"
+printf "%s\n" "cat ${INPUT}.log"
+printf "%s\n" " "
+printf "%s\n" " Kaya user shortcuts! "
+printf "%s is an environment variable it is set to %s\n" '$MYSCRATCH' "$MYSCRATCH"
+printf "%s is an environment variable it is set to %s\n" '$MYGROUP' "$MYGROUP"
+printf '%s\n' ' example:  cd $MYGROUP '
 
-echo " "  
-echo "more information about Kaya can be found at:"
-echo " https://docs.hpc.uwa.edu.au/docs"
-echo " "
-echo "more information about SLURM and srun can be found at:"
-echo " https://docs.hpc.uwa.edu.au/docs/slurm"
-echo " "
-echo " "
+printf "%s\n" " "
+printf "%s\n" "more information about Kaya can be found at:"
+printf "%s\n" " https://docs.hpc.uwa.edu.au/docs"
+printf "%s\n" " "
+printf "%s\n" "more information about SLURM and srun can be found at:"
+printf "%s\n" " https://docs.hpc.uwa.edu.au/docs/slurm"
+printf "%s\n" " "
+printf "%s\n" " "

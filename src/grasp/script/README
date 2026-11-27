@@ -1,3 +1,20 @@
-Edit the file disks for your directory structure!!!
-This run is for 4 processes (np = 4)
-Change np in sh_scf and in sc_tr if needed
+
+GRASP case1_mpi calculation scripts
+
+This example uses 34 MPI processes on one Kaya node.
+
+The MPI process count is obtained from the SLURM allocation
+through the SLURM_NTASKS environment variable.
+
+The main calculation workflow is:
+
+1. sh_files_c  - Generate the configuration state functions
+2. sh_nuc      - Obtain nuclear data
+3. sh_initial  - Generate initial wavefunction estimates
+4. sh_scf      - Perform self-consistent-field and CI calculations
+5. sh_tr       - Perform transition calculations
+
+The main script sh_case1 runs these steps in sequence.
+
+The MPI process count is controlled by grasp_mpi.slurm.
+Do not change the process count independently in these scripts.

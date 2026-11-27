@@ -26,14 +26,14 @@ RESULTS=$MYGROUP/swan_results
 if [ ! -d $SCRATCH ]; then 
     mkdir -p $SCRATCH 
 fi 
-echo Working SCRATCH directory is $SCRATCH
+printf 'Working SCRATCH directory is %s\n' "$SCRATCH"
 
 ###############################################
 # Creates a unique directory in your GROUP directory for the results of this job
 if [ ! -d $RESULTS ]; then 
      mkdir -p $RESULTS
 fi 
-echo Results will be store in $RESULTS/$SLURM_JOBID
+printf 'Results will be store in %s/%s\n' "$RESULTS" "$SLURM_JOBID"
 
 #############################################
 #   Copy input files to $SCRATCH
@@ -58,6 +58,6 @@ mv ${SCRATCH} ${RESULTS}
 
 rm -r $SCRATCH
 
-echo SWAN OpenMP/thread job finished at  `date`
+printf 'SWAN OpenMP/thread job finished at %s\n' "$(date)"
 
 

@@ -1,0 +1,59 @@
+#!/bin/bash --login
+# This is the README file is an executable script.
+# To run type: ./README
+#
+# Example OBJECTIVE: to demonstrate hello_mpi.c example on Kaya
+# with GNU Environment.
+# Copy the hello_mpi.c source code
+cp $GE_DIR/src/hello_mpi.c .
+
+# hello_mpi.c is an MPI code that runs on 2 nodes 
+# with 24 MPI tasks on each node.
+# To run this code, we specify the total number of MPI tasks
+# and the number of MPI tasks per node.
+# This information is located under hello_mpi_gnu.slurm
+# You can edit the SLURM script as: nano hello_mpi_gnu.slurm
+
+# SLURM directives (set in hello_mpi_gnu.slurm):
+# Here we specify to SLURM we want 2 nodes (--nodes=2),
+# 48 MPI tasks (--ntasks=48), and 24 tasks per node (--ntasks-per-node=24).
+# Load the GNU and OpenMPI toolchain:
+module load gcc/14.3.0 openmpi/5.0.5
+
+# Inside hello_mpi_gnu.slurm, MPI tasks are launched with mpirun:
+# mpirun -np $SLURM_NTASKS ./$EXECUTABLE >> ${OUTPUT}
+
+# To compile the hello_mpi.c code with GNU
+mpicc -O2 hello_mpi.c -o hello_mpi_gnu
+
+# To submit the job to Kaya
+jobid=$(sbatch --parsable hello_mpi_gnu.slurm)
+printf '\n'
+printf '%s\n' "The sbatch command returns what the jobid is for this job."
+printf '%s\n' "To check the status of your job, use the slurm command:"
+printf '%s\n' "squeue -u $USER"
+printf '%s\n' " "
+printf '%s\n' "Your job will be run in $MYSCRATCH/run_hello_mpi_c_gnu/${jobid}."
+printf '%s\n' " "
+printf '%s\n' "Your results will be saved in ${MYGROUP}/hello_mpi_c_gnu_results/${jobid}"
+printf '%s\n' "and the scratch directory will then be deleted."
+printf '%s\n' " "
+printf '%s\n' "To check the results change to your jobid directory, type:"
+printf '%s\n' "cd ${MYGROUP}/hello_mpi_c_gnu_results/${jobid}"
+printf '%s\n' " "
+printf '%s\n' "To view the results, use the cat command and type:"
+printf '%s\n' "cat hello_mpi_c_gnu.log"
+printf '%s\n' " "
+printf '%s\n' " Kaya user shortcuts! "
+printf '%s %s\n' '$MYSCRATCH' "is an environment variable it is set to $MYSCRATCH"
+printf '%s %s\n' '$MYGROUP' "is an environment variable it is set to $MYGROUP"
+printf '%s\n' " example:  cd \$MYGROUP "
+
+printf '%s\n' " "
+printf '%s\n' "more information about Kaya can be found at:"
+printf '%s\n' " https://docs.hpc.uwa.edu.au/docs"
+printf '%s\n' " "
+printf '%s\n' "more information about SLURM and srun can be found at:"
+printf '%s\n' " https://docs.hpc.uwa.edu.au/docs/slurm"
+printf '%s\n' " "
+printf '%s\n' " "

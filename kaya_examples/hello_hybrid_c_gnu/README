@@ -1,0 +1,62 @@
+#!/bin/bash --login
+# This README file is an executable script.
+# To run type: ./README
+#
+# Example OBJECTIVE: to demonstrate hello_hybrid.c example
+# on Kaya with GNU Environment. This is a mixed-mode job 
+# which includes both MPI and OpenMP.
+
+# Copy the hello_hybrid.c source code
+cp $GE_DIR/src/hello_hybrid.c .
+
+# To run this code, we specify the number of nodes, the total number
+# of MPI tasks, the number of MPI tasks per node, and the number of
+# OpenMP threads per MPI task.
+# This information is located under hello_hybrid_gnu.slurm
+# You can edit the SLURM script as: nano hello_hybrid_gnu.slurm
+
+# SLURM directives (set in hello_hybrid_gnu.slurm):
+# Here we specify to SLURM we want 2 nodes (--nodes=2),
+# 8 MPI tasks (--ntasks=8), 4 MPI tasks per node (--ntasks-per-node=4),
+# and 6 CPUs per task (--cpus-per-task=6).
+# Load the GNU and OpenMPI toolchain:
+module load gcc/14.3.0 openmpi/5.0.5
+
+# Inside hello_hybrid_gnu.slurm, we set OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
+# and launch the hybrid executable with mpirun:
+# mpirun -np $SLURM_NTASKS --bind-to none -x OMP_NUM_THREADS ./${EXECUTABLE} >> ${OUTPUT}
+
+# To compile the hello_hybrid.c code in the GNU Environment
+mpicc -O2 -fopenmp hello_hybrid.c -o hello_hybrid_gnu
+
+# To submit the job to Kaya
+jobid=$(sbatch --parsable hello_hybrid_gnu.slurm)
+printf '%s\n' ""
+printf '%s\n' "The sbatch command returns what the jobid is for this job."
+printf '%s\n' "To check the status of your job, use the slurm command:"
+printf '%s\n' "squeue -u $USER"
+printf '%s\n' " "
+printf '%s\n' "Your job will be run in $MYSCRATCH/run_hello_hybrid_c_gnu/${jobid}."
+printf '%s\n' " "
+printf '%s\n' "Your results will be saved in ${MYGROUP}/hello_hybrid_c_gnu_results/${jobid}"
+printf '%s\n' "and the scratch directory will then be deleted."
+printf '%s\n' " "
+printf '%s\n' "To check the results change to your jobid directory, type:"
+printf '%s\n' "cd ${MYGROUP}/hello_hybrid_c_gnu_results/${jobid}"
+printf '%s\n' " "
+printf '%s\n' "To view the results, use the cat command and type:"
+printf '%s\n' "cat hello_hybrid_c_gnu.log"
+printf '%s\n' " "
+printf '%s\n' " Kaya user shortcuts! "
+printf '%s %s\n' '$MYSCRATCH' "is an environment variable it is set to $MYSCRATCH"
+printf '%s %s\n' '$MYGROUP' "is an environment variable it is set to $MYGROUP"
+printf '%s\n' " example:  cd \$MYGROUP "
+
+printf '%s\n' " "
+printf '%s\n' "more information about Kaya can be found at:"
+printf '%s\n' " https://docs.hpc.uwa.edu.au/docs"
+printf '%s\n' " "
+printf '%s\n' "more information about SLURM and srun can be found at:"
+printf '%s\n' " https://docs.hpc.uwa.edu.au/docs/slurm"
+printf '%s\n' " "
+printf '%s\n' " "

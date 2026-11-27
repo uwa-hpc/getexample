@@ -1,0 +1,64 @@
+#!/bin/bash --login
+# This is the README file is an executable script.
+# To run type: ./README
+#
+# Example OBJECTIVE: to demonstrate hybrid_hello.f90 example
+# with thread placement on Kaya in the GNU environment. 
+# Copy the hybrid_hello.f90 source code
+cp $GE_DIR/src/hybrid_hello.f90 .
+
+# This is a hybrid MPI/OpenMP job where we run 24 MPI tasks
+# with 2 OpenMP threads per MPI task pinned to CPU cores.
+# To run this code, we specify the number of MPI tasks,
+# the number of MPI tasks per node, and the number of CPUs per task.
+# This information is located under thread_placement_gnu.slurm
+# You can edit the SLURM script as: nano thread_placement_gnu.slurm
+
+# SLURM directives (set in thread_placement_gnu.slurm):
+# Here we specify to SLURM we want 1 node (--nodes=1),
+# 24 MPI tasks (--ntasks=24), 24 MPI tasks per node (--ntasks-per-node=24),
+# and 2 CPUs per task (--cpus-per-task=2).
+# Load the GNU and OpenMPI toolchain:
+module load gcc/14.3.0 openmpi/5.0.5
+
+# Inside thread_placement_gnu.slurm, thread placement is set with:
+# export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
+# export OMP_PLACES=cores
+# export OMP_PROC_BIND=close
+# and launched via mpirun:
+# mpirun -np $SLURM_NTASKS --bind-to none -x OMP_NUM_THREADS -x OMP_PLACES -x OMP_PROC_BIND ./$EXECUTABLE >> ${OUTPUT}
+
+# To compile the hybrid_hello.f90 code with GNU
+mpif90 -O2 -fopenmp hybrid_hello.f90 -o thread_placement_gnu
+
+# To submit the job to Kaya
+jobid=$(sbatch --parsable thread_placement_gnu.slurm)
+printf '\n'
+printf "%s\n" "The sbatch command returns what the jobid is for this job."
+printf "%s\n" "To check the status of your job, use the slurm command:"
+printf "%s\n" "squeue -u $USER"
+printf "%s\n" " "
+printf "%s\n" "Your job will be run in $MYSCRATCH/run_thread_placement_gnu/${jobid}."
+printf "%s\n" " "
+printf "%s\n" "Your results will be saved in ${MYGROUP}/thread_placement_gnu_results/${jobid}"
+printf "%s\n" "and the scratch directory will then be deleted."
+printf "%s\n" " "
+printf "%s\n" "To check the results change to your jobid directory, type:"
+printf "%s\n" "cd ${MYGROUP}/thread_placement_gnu_results/${jobid}"
+printf "%s\n" " "
+printf "%s\n" "To view the results, use the cat command and type:"
+printf "%s\n" "cat thread_placement_gnu.log"
+printf "%s\n" " "
+printf "%s\n" " Kaya user shortcuts! "
+printf '%s is an environment variable it is set to %s\n' '$MYSCRATCH' "$MYSCRATCH"
+printf '%s is an environment variable it is set to %s\n' '$MYGROUP' "$MYGROUP"
+printf "%s\n" " example:  cd \$MYGROUP "
+
+printf "%s\n" " "
+printf "%s\n" "more information about Kaya can be found at:"
+printf "%s\n" " https://docs.hpc.uwa.edu.au/docs"
+printf "%s\n" " "
+printf "%s\n" "more information about SLURM and srun can be found at:"
+printf "%s\n" " https://docs.hpc.uwa.edu.au/docs/slurm"
+printf "%s\n" " "
+printf "%s\n" " "

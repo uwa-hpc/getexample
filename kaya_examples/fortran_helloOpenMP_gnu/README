@@ -1,0 +1,62 @@
+#!/bin/bash --login
+# This README file is an executable script.
+# To run type: ./README
+#
+# Example OBJECTIVE: to demonstrate omp_hello.f example on Kaya
+# in the GNU environment where omp_hello.f
+# is an OpenMP code and runs on a single node.
+
+# Copy the omp_hello.f source code
+cp $GE_DIR/src/omp_hello.f .
+
+# omp_hello.f is taken from
+# https://llnl.gov
+# To run this code, we specify the number of tasks
+# and the number of OpenMP threads per task.
+# This information is located under hello_omp_gnu.slurm
+# You can edit the SLURM script as: nano hello_omp_gnu.slurm
+
+# SLURM directives (set in hello_omp_gnu.slurm):
+# Here we specify to SLURM we want 1 node (--nodes=1),
+# 1 task (--ntasks=1), and 24 CPUs per task (--cpus-per-task=24).
+# Load the GNU compiler module:
+module load gcc/14.3.0
+
+# Inside hello_omp_gnu.slurm, we set OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
+# and launch the executable:
+# ./$EXECUTABLE >> ${OUTPUT}
+
+# To compile the omp_hello.f code with GNU
+gfortran -O2 -fopenmp omp_hello.f -o hello_omp_gnu
+
+# To submit the job to Kaya
+jobid=$(sbatch --parsable hello_omp_gnu.slurm)
+
+printf '%s\n' "The sbatch command returns what the jobid is for this job."
+printf '%s\n' "To check the status of your job, use the slurm command:"
+printf '%s\n' "squeue -u $USER"
+printf ' \n'
+printf '%s\n' "Your job will be run in $MYSCRATCH/run_fortran_helloOpenMP_gnu/${jobid}."
+printf ' \n'
+printf '%s\n' "Your results will be saved in ${MYGROUP}/fortran_helloOpenMP_gnu_results/${jobid}"
+printf '%s\n' "and the scratch directory will then be deleted."
+printf ' \n'
+printf '%s\n' "To check the results change to your jobid directory, type:"
+printf '%s\n' "cd ${MYGROUP}/fortran_helloOpenMP_gnu_results/${jobid}"
+printf ' \n'
+printf '%s\n' "To view the results, use the cat command and type:"
+printf '%s\n' "cat fortran_helloOpenMP_gnu.log"
+printf ' \n'
+printf '%s\n' " Kaya user shortcuts! "
+printf '%s %s\n' '$MYSCRATCH' "is an environment variable it is set to $MYSCRATCH"
+printf '%s %s\n' '$MYGROUP' "is an environment variable it is set to $MYGROUP"
+printf '%s\n' " example:  cd \$MYGROUP "
+
+printf ' \n'
+printf '%s\n' "more information about Kaya can be found at:"
+printf '%s\n' " https://docs.hpc.uwa.edu.au/docs"
+printf ' \n'
+printf '%s\n' "more information about SLURM and srun can be found at:"
+printf '%s\n' " https://docs.hpc.uwa.edu.au/docs/slurm"
+printf ' \n'
+printf ' \n'

@@ -1,0 +1,60 @@
+#!/bin/bash --login
+# This is the README file is an executable script.
+# To run type: ./README
+#
+# Example OBJECTIVE: to demonstrate hello_mpi.f90 example 
+# on Kaya in the Intel environment.
+# Copy the hello_mpi.f90 source code
+cp $GE_DIR/src/hello_mpi.f90 .
+
+# hello_mpi.f90 is an MPI code that runs on 2 nodes 
+# with 24 MPI tasks on each node.
+# To run this code, we specify the total number of MPI tasks
+# and the number of MPI tasks per node.
+# This information is located under hello_mpi_intel.slurm
+# You can edit the SLURM script as: nano hello_mpi_intel.slurm
+
+# SLURM directives (set in hello_mpi_intel.slurm):
+# Here we specify to SLURM we want 2 nodes (--nodes=2),
+# 48 MPI tasks (--ntasks=48), and 24 tasks per node (--ntasks-per-node=24).
+# Load the Intel oneAPI compiler and MPI environment:
+module use /uwahpc/rocky9/modulefiles/intel/2023.0
+module load compiler mpi
+
+# Inside hello_mpi_intel.slurm, MPI tasks are launched with mpirun:
+# mpirun -np $SLURM_NTASKS ./$EXECUTABLE >> ${OUTPUT}
+
+# To compile the hello_mpi.f90 code with Intel MPI
+mpiifort -O2 hello_mpi.f90 -o hello_mpi_intel
+
+# To submit the job to Kaya
+jobid=$(sbatch --parsable hello_mpi_intel.slurm)
+printf '\n'
+printf '%s\n' "The sbatch command returns what the jobid is for this job."
+printf '%s\n' "To check the status of your job, use the slurm command:"
+printf '%s\n' "squeue -u $USER"
+printf ' \n'
+printf '%s\n' "Your job will be run in $MYSCRATCH/run_fortranMPI_intel/${jobid}."
+printf ' \n'
+printf '%s\n' "Your results will be saved in ${MYGROUP}/fortranMPI_intel_results/${jobid}"
+printf '%s\n' "and the scratch directory will then be deleted."
+printf ' \n'
+printf '%s\n' "To check the results change to your jobid directory, type:"
+printf '%s\n' "cd ${MYGROUP}/fortranMPI_intel_results/${jobid}"
+printf ' \n'
+printf '%s\n' "To view the results, use the cat command and type:"
+printf '%s\n' "cat fortranMPI_intel.log"
+printf ' \n'
+printf '%s\n' " Kaya user shortcuts! "
+printf '%s %s\n' '$MYSCRATCH' "is an environment variable it is set to $MYSCRATCH"
+printf '%s %s\n' '$MYGROUP' "is an environment variable it is set to $MYGROUP"
+printf '%s\n' " example:  cd \$MYGROUP "
+
+printf ' \n'
+printf '%s\n' "more information about Kaya can be found at:"
+printf '%s\n' " https://docs.hpc.uwa.edu.au/docs"
+printf ' \n'
+printf '%s\n' "more information about SLURM and srun can be found at:"
+printf '%s\n' " https://docs.hpc.uwa.edu.au/docs/slurm"
+printf ' \n'
+printf ' \n'

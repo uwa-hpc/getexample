@@ -1,12 +1,12 @@
 #!/bin/bash --login
 #SBATCH --job-name=GE-helloC_gnu
-#SBATCH --partition=training
+#SBATCH --partition=work
 #SBATCH --nodes=1
 #SBATCH --time=00:05:00   
 #SBATCH --export=NONE
 
 # To compile with the GNU toolchain
-module load gcc/9.4.0
+module load gcc/14.3.0
 
 # leave in, it lists the environment loaded by the modules
 module list
@@ -22,14 +22,14 @@ RESULTS=$MYGROUP/helloC_gnu_results/$SLURM_JOBID
 if [ ! -d $SCRATCH ]; then 
     mkdir -p $SCRATCH 
 fi 
-echo SCRATCH is $SCRATCH
+printf 'SCRATCH is %s\n' "$SCRATCH"
 
 ###############################################
 # Creates a unique directory in your GROUP directory for the results of this job
 if [ ! -d $RESULTS ]; then 
     mkdir -p $RESULTS 
 fi
-echo the results directory is $RESULTS
+printf 'the results directory is %s\n' "$RESULTS"
 
 ################################################
 # declare the name of the output file or log file
@@ -42,6 +42,7 @@ OUTPUT=helloC_gnu.log
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
+ls -al
 
 srun -n 1 ./$EXECUTABLE >> ${OUTPUT}
 
@@ -57,6 +58,6 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo helloC_gnu job finished at  `date`
+printf 'helloC_gnu job finished at %s\n' "$(date)"
 
 

@@ -35,21 +35,21 @@ set RESULTS = $MYGROUP/molpro_results
 setenv OMP_NUM_THREADS ${SLURM_CPUS_PER_TASK}
 setenv MKL_NUM_THREADS ${SLURM_CPUS_PER_TASK}
 
-echo "The number of threads/cores is  $OMP_NUM_THREADS "
+printf '%s\n' "The number of threads/cores is  $OMP_NUM_THREADS "
 
 ###############################################
 # Creates a unique directory in the SCRATCH directory for this job to run in.
 if ( ! -d $SCRATCH ) then 
     mkdir -p $SCRATCH 
 endif 
-echo SCRATCH is $SCRATCH
+printf '%s\n' "SCRATCH is $SCRATCH"
 
 ###############################################
 # Creates a unique directory in your GROUP directory for the results of this job
 if ( ! -d $RESULTS ) then 
     mkdir -p $RESULTS 
 endif
-echo the results directory is $RESULTS
+printf '%s\n' "the results directory is $RESULTS"
 
 #############################################
 #   Copy input files to $SCRATCH
@@ -75,4 +75,4 @@ if ( -d ${SCRATCH} ) then
    rm -r ${SCRATCH}
 endif
 
-echo Molpro job on kaya finished at  `date` 
+printf 'Molpro job on kaya finished at %s\n' "`date`"

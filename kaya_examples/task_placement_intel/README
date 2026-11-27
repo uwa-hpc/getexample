@@ -1,0 +1,62 @@
+#!/bin/bash --login
+# This is the README file is an executable script.
+# To run type: ./README
+#
+# Example OBJECTIVE: to demonstrate hello_mpi.f90 example
+# on Kaya in the Intel environment with explicit task placement.
+# hello_mpi.f90 is an MPI code that pins each MPI task
+# directly to a CPU core on a single node.
+# Copy the hello_mpi.f90 source code
+cp $GE_DIR/src/hello_mpi.f90 .
+
+# To run this code, we specify the total number of MPI tasks
+# and the number of MPI tasks per node.
+# This information is located under task_placement_intel.slurm
+# You can edit the SLURM script as: nano task_placement_intel.slurm
+
+# SLURM directives (set in task_placement_intel.slurm):
+# Here we specify to SLURM we want 1 node (--nodes=1),
+# 48 MPI tasks (--ntasks=48), and 48 tasks per node (--ntasks-per-node=48).
+# Load the Intel oneAPI compiler and MPI environment:
+module use /uwahpc/rocky9/modulefiles/intel/2023.0
+module load compiler mpi
+
+# Inside task_placement_intel.slurm, Intel MPI task pinning is enabled:
+# export I_MPI_PIN=1
+# export I_MPI_PIN_PROCESSOR_LIST=allcores
+# mpirun -np $SLURM_NTASKS ./$EXECUTABLE >> ${OUTPUT}
+
+# To compile the hello_mpi.f90 code with Intel MPI
+mpiifort -O2 hello_mpi.f90 -o task_placement_intel
+
+# To submit the job to Kaya
+jobid=$(sbatch --parsable task_placement_intel.slurm)
+printf '\n'
+printf "%s\n" "The sbatch command returns what the jobid is for this job."
+printf "%s\n" "To check the status of your job, use the slurm command:"
+printf "%s\n" "squeue -u $USER"
+printf "%s\n" " "
+printf "%s\n" "Your job will be run in $MYSCRATCH/run_task_placement_intel/${jobid}."
+printf "%s\n" " "
+printf "%s\n" "Your results will be saved in ${MYGROUP}/task_placement_intel_results/${jobid}"
+printf "%s\n" "and the scratch directory will then be deleted."
+printf "%s\n" " "
+printf "%s\n" "To check the results change to your jobid directory, type:"
+printf "%s\n" "cd ${MYGROUP}/task_placement_intel_results/${jobid}"
+printf "%s\n" " "
+printf "%s\n" "To view the results, use the cat command and type:"
+printf "%s\n" "cat task_placement_intel.log"
+printf "%s\n" " "
+printf "%s\n" " Kaya user shortcuts! "
+printf '%s is an environment variable it is set to %s\n' '$MYSCRATCH' "$MYSCRATCH"
+printf '%s is an environment variable it is set to %s\n' '$MYGROUP' "$MYGROUP"
+printf "%s\n" " example:  cd \$MYGROUP "
+
+printf "%s\n" " "
+printf "%s\n" "more information about Kaya can be found at:"
+printf "%s\n" " https://docs.hpc.uwa.edu.au/docs"
+printf "%s\n" " "
+printf "%s\n" "more information about SLURM and srun can be found at:"
+printf "%s\n" " https://docs.hpc.uwa.edu.au/docs/slurm"
+printf "%s\n" " "
+printf "%s\n" " "

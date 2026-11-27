@@ -10,8 +10,8 @@
 #SBATCH --time=06:00:00   
 #SBATCH --export=NONE
 
-# To compile with the ansys - lsdyna environment
-module load ansys/v195
+# Load the Ansys / LS-DYNA environment
+module load ansys/v261
 
 # leave in, it lists the environment loaded by the modules
 module list
@@ -28,14 +28,14 @@ RESULTS=${MYGROUP}/lsdyna_foam_results/$SLURM_JOBID
 if [ ! -d $SCRATCH ]; then 
     mkdir -p $SCRATCH 
 fi 
-echo SCRATCH is $SCRATCH
+printf '%s\n' "SCRATCH is $SCRATCH"
 
 ###############################################
 # Creates a unique directory in your GROUP directory for the results of this job
 if [ ! -d $RESULTS ]; then 
     mkdir -p $RESULTS 
 fi
-echo the results directory is $RESULTS
+printf '%s\n' "the results directory is $RESULTS"
 
 ################################################
 # declare the name of the output file or log file
@@ -44,18 +44,31 @@ OUTPUT=dyna_foam.log
 #############################################
 #   Copy input files to $SCRATCH
 #   then change directory to $SCRATCH
-
+cd ${SLURM_SUBMIT_DIR}
 cp $INPUT $SCRATCH
 
 cd $SCRATCH
+ls -al
 
 # run the lsdyna simulation 
-lsdyna i=$INPUT ncpu=${SLURM_NPROCS}   > ${OUTPUT}
+lsdyna i=$INPUT ncpu=${SLURM_NTASKS} > ${OUTPUT}
+
+if [ $? -ne 0 ]; then
+    cd
+    OUTPUT2=kaya_results.log
+    printf '%s\n' "lsdyna (${INPUT}) with jobID $SLURM_JOBID Failed" >> ${OUTPUT2}
+else
+    cd
+    OUTPUT2=kaya_results.log
+    printf '%s\n' "lsdyna (${INPUT}) with jobID $SLURM_JOBID Succeeded" >> ${OUTPUT2}
+fi
+
+cd $SCRATCH
 
 #############################################
 #    $OUTPUT file to the unique results dir
 # note this can be a copy or move  
-mv  $OUTPUT ${RESULTS}
+mv $OUTPUT ${RESULTS}
 
 cd $HOME
 
@@ -64,6 +77,4 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo LSDYNA example job finished at `date`
-
-
+printf 'LSDYNA example job finished at %s\n' "$(date)"

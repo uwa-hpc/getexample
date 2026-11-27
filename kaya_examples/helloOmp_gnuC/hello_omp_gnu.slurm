@@ -1,12 +1,21 @@
 #!/bin/bash --login
 #SBATCH --job-name=GE-helloOmp_gnuC
-#SBATCH --partition=POPHEALTH
+#SBATCH --partition=work
 #SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=24
+# -N is equivalent to --nodes
+# -n is equivalent to --ntasks
+# -c is equivalent to --cpus-per-task
+#SBATCH --mem-per-cpu=4GB
+# the default is 1G per cpu(core)
+# HINT!
+# --mem=0 is a special case and grants the job access to all the memory on each node!
 #SBATCH --time=00:05:00
 #SBATCH --export=NONE
 
-# to compile with GNU, swap from Cray environment to GNU
-module swap gcc
+# Load the GNU compilers environment
+module load gcc/14.3.0
 
 # leave in, it lists the environment loaded by the modules
 module list
@@ -14,22 +23,22 @@ module list
 #  Note: SLURM_JOBID is a unique number for every job.
 #  These are generic variables
 EXECUTABLE=hello_omp_gnu
-SCRATCH=/home/$USER/run_helloOmp_gnuC/$SLURM_JOBID
-RESULTS=$HOME/helloomp_c_gnu_results/$SLURM_JOBID
+SCRATCH=$MYSCRATCH/run_helloOmp_gnuC/$SLURM_JOBID
+RESULTS=$MYGROUP/helloOmp_gnuC_results/$SLURM_JOBID
 
 ###############################################
 # Creates a unique directory in the SCRATCH directory for this job to run in.
 if [ ! -d $SCRATCH ]; then 
     mkdir -p $SCRATCH 
 fi 
-echo SCRATCH is $SCRATCH
+printf 'SCRATCH is %s\n' "$SCRATCH"
 
 ###############################################
 # Creates a unique directory in your GROUP directory for the results of this job
 if [ ! -d $RESULTS ]; then 
     mkdir -p $RESULTS 
 fi
-echo the results directory is $RESULTS
+printf 'the results directory is %s\n' "$RESULTS"
 
 ################################################
 # declare the name of the output file or log file
@@ -42,14 +51,27 @@ OUTPUT=helloOmp_gnuC.log
 cp $EXECUTABLE $SCRATCH
 
 cd $SCRATCH
+ls -al
 
 export OMP_NUM_THREADS=24
-./$EXECUTABLE >> ${OUTPUT}
+srun -n 1 -c $SLURM_CPUS_PER_TASK ./$EXECUTABLE >> ${OUTPUT}
+
+if [ $? -ne 0 ]; then
+    cd
+    OUTPUT2=kaya_results.log
+    printf '%s with jobID %s Failed\n' "$EXECUTABLE" "$SLURM_JOBID" >> "$OUTPUT2"
+else
+    cd
+    OUTPUT2=kaya_results.log
+    printf '%s with jobID %s Succeeded\n' "$EXECUTABLE" "$SLURM_JOBID" >> "$OUTPUT2"
+fi
+
+cd $SCRATCH
 
 #############################################
-#    $OUTPUT file to the unique results dir
-# note this can be a copy or move  
-mv  $OUTPUT ${RESULTS}
+# $OUTPUT file to the unique results dir
+# note this can be a cp (copied) or mv (moved)  
+cp  $OUTPUT ${RESULTS}
 
 cd $HOME
 
@@ -58,8 +80,4 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo helloOmp_gnuC job finished at  `date`
-
-
-# To swap from GNU environment to the default program environment:
-module swap PrgEnv-gnu PrgEnv-cray
+printf 'helloOmp_gnuC job finished at %s\n' "$(date)"

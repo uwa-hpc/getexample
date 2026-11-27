@@ -1,6 +1,6 @@
 #!/bin/bash --login
 #SBATCH --job-name=GE-structure
-#SBATCH --partition=test
+#SBATCH --partition=work
 #SBATCH --nodes=1
 #SBATCH --task=1
 #SBATCH --mem-per-cpu=10G
@@ -8,7 +8,7 @@
 #SBATCH --export=NONE
 
 # Load the GNU and structure environment modules
-module load gcc structure
+module load gcc/14.3.0 structure/2.3.4
 
 # leave in, it lists the environment loaded by the modules
 module list
@@ -28,14 +28,14 @@ RESULTS=$MYGROUP/structure_results
 if [ ! -d $SCRATCH ]; then 
     mkdir -p $SCRATCH 
 fi 
-echo SCRATCH is $SCRATCH
+printf 'SCRATCH is %s\n' "$SCRATCH"
 
 ###############################################
 # Creates a unique directory in your GROUP directory for the results of this job
 if [ ! -d $RESULTS ]; then 
     mkdir -p $RESULTS 
 fi
-echo the results directory is $RESULTS
+printf 'the results directory is %s\n' "$RESULTS"
 
 ################################################
 # declare the name of the output file or log file
@@ -48,6 +48,7 @@ OUTPUT=struct.log
 cp $DATA $SCRATCH
 
 cd $SCRATCH
+ls -al
 
 $EXEC $DATA > ${OUTPUT}
 
@@ -63,4 +64,4 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo structure job finished at  `date`
+printf 'structure job finished at %s\n' "$(date)"

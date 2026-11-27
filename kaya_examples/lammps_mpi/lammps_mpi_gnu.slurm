@@ -25,14 +25,14 @@ export OMP_NUM_THREADS=36
 if [ ! -d $SCRATCH ]; then 
     mkdir -p $SCRATCH 
 fi 
-echo SCRATCH is $SCRATCH
+printf 'SCRATCH is %s\n' "$SCRATCH"
 
 ###############################################
 # Creates a unique directory in your GROUP directory for the results of this job
 if [ ! -d $RESULTS ]; then 
     mkdir -p $RESULTS 
 fi
-echo the results directory is $RESULTS
+printf 'the results directory is %s\n' "$RESULTS"
 
 ################################################
 # declare the name of the output file or log file
@@ -43,7 +43,7 @@ OUTPUT=lammps.log
 #   then change directory to $SCRATCH
 
 
-cp *.lmp $SCRATCH
+cp "$GE_DIR/src/lammps/"*.lmp "$SCRATCH/"
 
 cd $SCRATCH
 
@@ -62,4 +62,4 @@ cd $HOME
 
 rm -r $SCRATCH
 
-echo lammps_mpi job finished at  `date`
+printf 'lammps_mpi job finished at %s\n' "$(date)"
